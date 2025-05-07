@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = 'https://flask-hello-world-u7ol.onrender.com';
+const API_URL = 'https://sreevardhan1729-aijobfit-backend.hf.space';
 
 const getJobSkills = async (jobDescription) => {
     try {
@@ -8,7 +8,7 @@ const getJobSkills = async (jobDescription) => {
         formData.append('job_description', jobDescription);
         const response = await axios.post(`${API_URL}/jobdetails`, formData, {
             headers: {
-                'Content-Type': 'multipart/form-data',  // Ensure Content-Type is set for form data
+                'Content-Type': 'multipart/form-data',
             }
         });
         return response.data;
