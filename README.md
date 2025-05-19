@@ -95,8 +95,10 @@ Created as a full-stack personal project integrating React, Flask, and NLP.
 
 ## 👨‍💻 Author
 
-**Your Name**  
-[GitHub]([https://github.com/your-profile](https://github.com/Sreevardhan1729)) • [LinkedIn]([https://linkedin.com/in/your-profile](https://www.linkedin.com/in/sreevardhanreddy/))
+**Sree Vardhan Reddy**
+
+[GitHub](https://github.com/Sreevardhan1729) • [LinkedIn](https://www.linkedin.com/in/sreevardhanreddy/)
+
 
 ---
 
