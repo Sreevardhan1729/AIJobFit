@@ -35,10 +35,33 @@ const getComparision = async(resume, jobDescription) => {
     }
 }
 
+const getJobs = async({SITE,search_term,country,city,job_type,resumeFile}) => {
+    try{
+        const formData = new FormData()
+        SITE.forEach((site) => formData.append('SITE',site));
+        formData.append('search_term',search_term);
+        formData.append('country',country);
+        formData.append('city',city);
+        formData.append('job_type',job_type);
+        formData.append('resume',resumeFile);
+
+        const response = await axios.post(`${API_URL}/getJobs`,formData,{
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            }
+        });
+        return response.data
+    }
+    catch (error){
+        console.log("Error fetching Job Details", error);
+        throw error;
+    }
+}
 
 const moduleExports = {
     getComparision,
-    getJobSkills
+    getJobSkills,
+    getJobs
   };
   
   export default moduleExports;
