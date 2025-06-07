@@ -5,8 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import "../index.css"
 
 const ResumeJob = () => {
-    const naviage = useNavigate()
-    const { getComparision } = moduleExports;
+    const navigate = useNavigate()
+    const { getComparison } = moduleExports;
     const [resumeFile,setResumeFile] = useState(null)
     const [jobDescription,setJobDescription] = useState('')
     const [error,setError] = useState('')
@@ -27,7 +27,7 @@ const ResumeJob = () => {
             return ;
         }
         try{
-            const data = await getComparision(resumeFile,jobDescription)
+            const data = await getComparison(resumeFile,jobDescription)
             setResult(data)
             setSubmitted(true)
         } catch(err){
@@ -40,7 +40,7 @@ const ResumeJob = () => {
         textarea.style.height = Math.min(textarea.scrollHeight,300) + "px"
     }
     const handleBackClick = () => {
-      naviage('/')
+      navigate('/')
     }
     return (
       <div className="max-w-screen-md mx-auto py-20 px-4">

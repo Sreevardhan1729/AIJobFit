@@ -6,11 +6,6 @@ import ResumeJob from './Pages/ResumeJob';
 import GetJobs from './Pages/GetJobs';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-
-
-// About component
-
-
 const App = () => {
   
 
