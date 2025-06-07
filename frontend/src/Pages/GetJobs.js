@@ -10,14 +10,16 @@ const siteOptions = [
 
 ];
 
-// Map each country to its main cities
 const cityOptionsByCountry = {
   India: ['Delhi', 'Mumbai', 'Bangalore', 'Chennai', 'Kolkata', 'Hyderabad'],
   USA: ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia'],
   Japan: ['Tokyo', 'Osaka', 'Kyoto', 'Yokohama', 'Nagoya', 'Sapporo'],
 };
 
-const JobCard = ({ job, index, jobType }) => (
+const JobCard = ({ job, index, jobType }) => {
+  const navigate = useNavigate();
+
+  return (
   <motion.div
     layout
     initial={{ opacity: 0, y: 20 }}
@@ -26,14 +28,14 @@ const JobCard = ({ job, index, jobType }) => (
     transition={{ duration: 0.4, delay: index * 0.05 }}
     className="relative w-[700px] h-[160px] overflow-hidden rounded-3xl bg-white p-6 shadow-lg"
   >
-    {/* Top-right More Details */}
     <button
       type="button"
+      onClick={() => navigate(`/get_jobs/${job.id}`, { state: { job } })}
       className="absolute top-6 right-6 rounded-md border border-gray-300 px-4 py-1.5 text-sm font-medium text-gray-600 backdrop-blur transition-colors duration-200 hover:border-gray-400 hover:bg-gray-100 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-300"
     >
       More Details
     </button>
-    {/* Title, badge, meta */}
+
     <div className="space-y-1 max-w-[60%]">
       <div className="flex items-center gap-3">
         <h2 className="truncate text-xl font-semibold leading-tight text-gray-800">
@@ -47,11 +49,11 @@ const JobCard = ({ job, index, jobType }) => (
         { job.company} • { job.location}
       </p>
     </div>
-    {/* Match % */}
+
     <span className="absolute bottom-6 left-6 inline-flex items-center rounded-full bg-blue-100/80 px-3 py-1 text-xs font-semibold text-blue-600 shadow-sm">
       {job.similarity_score} %Match
     </span>
-    {/* Apply Now */}
+
     <a
       href={job.job_url}  target="_blank" rel="noopener noreferrer"
       className="absolute bottom-6 right-6 inline-flex items-center justify-center rounded-md bg-gradient-to-br from-blue-600 to-indigo-600 px-5 py-2 text-sm font-medium text-white shadow-md transition-transform duration-200 hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-indigo-300"
@@ -59,7 +61,7 @@ const JobCard = ({ job, index, jobType }) => (
       Apply Now
     </a>
   </motion.div>
-);
+);}
 
 
 const GetJobs = () => {
@@ -159,9 +161,7 @@ const GetJobs = () => {
           >
         <div className="p-10 space-y-10">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-              {/* ------------------------------------------------ */}
               {/* Custom Multi-Select “Select Sites” */}
-              {/* ------------------------------------------------ */}
               <div ref={dropdownRef} className="relative">
                 <label className="block mb-2 font-medium text-gray-700 text-sm">
                   Select Sites:
@@ -214,10 +214,7 @@ const GetJobs = () => {
                   </div>
                 )}
               </div>
-
-              {/* ------------------------------------------------ */}
               {/* Job Title / Search Term */}
-              {/* ------------------------------------------------ */}
               <div>
                 <label className="block mb-2 font-medium text-gray-700 text-sm">
                   Job Title / Keyword:
@@ -230,10 +227,7 @@ const GetJobs = () => {
                   className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-300 text-gray-700 text-sm bg-gray-50"
                 />
               </div>
-
-              {/* ------------------------------------------------ */}
               {/* Country (only India, USA, Japan) */}
-              {/* ------------------------------------------------ */}
               <div>
                 <label className="block mb-2 font-medium text-gray-700 text-sm">
                   Country:
@@ -271,10 +265,7 @@ const GetJobs = () => {
                   </svg>
                 </div>
               </div>
-
-              {/* ------------------------------------------------ */}
               {/* City (populates based on selected country) */}
-              {/* ------------------------------------------------ */}
               <div>
                 <label className="block mb-2 font-medium text-gray-700 text-sm">
                   City:
@@ -320,10 +311,7 @@ const GetJobs = () => {
                   </svg>
                 </div>
               </div>
-
-              {/* ------------------------------------------------ */}
               {/* Job Type */}
-              {/* ------------------------------------------------ */}
               <div>
                 <label className="block mb-2 font-medium text-gray-700 text-sm">
                   Job Type:
@@ -362,10 +350,7 @@ const GetJobs = () => {
                   </svg>
                 </div>
               </div>
-
-              {/* ------------------------------------------------ */}
               {/* Resume Upload (full width on small+) */}
-              {/* ------------------------------------------------ */}
               <div className="sm:col-span-2">
                 <label className="block mb-2 font-medium text-gray-700 text-sm">
                   Upload Resume (PDF):
@@ -378,10 +363,7 @@ const GetJobs = () => {
                 />
               </div>
             </div>
-
-            {/* ------------------------------------------------ */}
             {/* Submit & Back Buttons */}
-            {/* ------------------------------------------------ */}
             <div className="flex justify-between items-center pt-6 border-t border-gray-200">
               <button
                   type="submit"
@@ -406,10 +388,7 @@ const GetJobs = () => {
                 Back
               </button>
             </div>
-
-            {/* ------------------------------------------------ */}
             {/* Error Message */}
-            {/* ------------------------------------------------ */}
             {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
         </div>
       </motion.form>
