@@ -18,7 +18,7 @@ const getJobSkills = async (jobDescription) => {
     }
 };
 
-const getComparision = async(resume, jobDescription) => {
+const getComparison = async(resume, jobDescription) => {
     try{
         const formData = new FormData();
         formData.append('job_description',jobDescription)
@@ -59,7 +59,7 @@ const getJobs = async({SITE,search_term,country,city,job_type,resumeFile}) => {
 }
 
 const moduleExports = {
-    getComparision,
+    getComparison,
     getJobSkills,
     getJobs
   };

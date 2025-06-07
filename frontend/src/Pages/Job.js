@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import "../index.css"
 
 const Job = () => {
-  const naviage = useNavigate()
+  const navigate = useNavigate()
   const {getJobSkills} = moduleExports
     const [jobDescription, setJobDescription]  = useState('')
     const [jobDetails, setJobDetails] = useState(null);
@@ -20,7 +20,7 @@ const Job = () => {
         setError('')
         setJobDetails('')
         if(!jobDescription.trim()){
-          setError("Plese enter Job Description")
+          setError("Please enter Job Description")
         }
         try{
             const data = await getJobSkills(jobDescription);
@@ -31,7 +31,7 @@ const Job = () => {
         }
     }
     const handleBackClick = ()=> {
-      naviage('/')
+      navigate('/')
     }
     return (
       <div className="max-w-screen-md mx-auto py-20 px-4">

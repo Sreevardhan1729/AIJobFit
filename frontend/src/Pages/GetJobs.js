@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import moduleExports from "../api"
+import { Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const siteOptions = [
   { label: 'LinkedIn', value: 'linkedin' },
@@ -14,6 +16,51 @@ const cityOptionsByCountry = {
   USA: ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia'],
   Japan: ['Tokyo', 'Osaka', 'Kyoto', 'Yokohama', 'Nagoya', 'Sapporo'],
 };
+
+const JobCard = ({ job, index, jobType }) => (
+  <motion.div
+    layout
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -20 }}
+    transition={{ duration: 0.4, delay: index * 0.05 }}
+    className="relative w-[700px] h-[160px] overflow-hidden rounded-3xl bg-white p-6 shadow-lg"
+  >
+    {/* Top-right More Details */}
+    <button
+      type="button"
+      className="absolute top-6 right-6 rounded-md border border-gray-300 px-4 py-1.5 text-sm font-medium text-gray-600 backdrop-blur transition-colors duration-200 hover:border-gray-400 hover:bg-gray-100 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-300"
+    >
+      More Details
+    </button>
+    {/* Title, badge, meta */}
+    <div className="space-y-1 max-w-[60%]">
+      <div className="flex items-center gap-3">
+        <h2 className="truncate text-xl font-semibold leading-tight text-gray-800">
+          { job.title}
+        </h2>
+        <span className="inline-flex items-center rounded-full bg-emerald-100/80 px-2 py-0.5 text-xs font-medium text-emerald-700 backdrop-blur">
+          { job.job_type || jobType}
+        </span>
+      </div>
+      <p className="truncate text-sm text-gray-500">
+        { job.company} • { job.location}
+      </p>
+    </div>
+    {/* Match % */}
+    <span className="absolute bottom-6 left-6 inline-flex items-center rounded-full bg-blue-100/80 px-3 py-1 text-xs font-semibold text-blue-600 shadow-sm">
+      {job.similarity_score} %Match
+    </span>
+    {/* Apply Now */}
+    <a
+      href="#"
+      className="absolute bottom-6 right-6 inline-flex items-center justify-center rounded-md bg-gradient-to-br from-blue-600 to-indigo-600 px-5 py-2 text-sm font-medium text-white shadow-md transition-transform duration-200 hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-indigo-300"
+    >
+      Apply Now
+    </a>
+  </motion.div>
+);
+
 
 const GetJobs = () => {
   const navigate = useNavigate();
@@ -29,8 +76,9 @@ const GetJobs = () => {
   const [resumeFile, setResumeFile] = useState(null);
   const [error, setError] = useState('');
   const dropdownRef = useRef(null);
-
-  const [jobsResult, setJobsResult] = useState(null);
+  const [submitted, setSubmitted] = useState(false);
+  const [jobsResult, setJobsResult] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleDropdownToggle = () => {
     setIsDropdownOpen((prev) => !prev);
@@ -76,11 +124,15 @@ const GetJobs = () => {
       return;
     }
     try {
+      setIsLoading(true);
       const response = await getJobs({SITE: selectedSites,search_term: searchTerm,country,city,job_type: jobType,resumeFile})
-      console.log(response)
+      setSubmitted(true);
+
       setJobsResult(response)
     } catch (err) {
       setError(err.message || 'An unexpected error occurred');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -96,9 +148,16 @@ const GetJobs = () => {
         Job Search
       </h1>
 
-      <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-2xl overflow-hidden">
-        <div className="p-10">
-          <form onSubmit={handleSubmit} className="space-y-10">
+      <AnimatePresence>
+      {!submitted && (
+          <motion.form
+            onSubmit={handleSubmit}
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0, transition: { duration: 0.4 } }}
+            className="max-w-3xl mx-auto bg-white rounded-lg shadow-2xl overflow-hidden"
+          >
+        <div className="p-10 space-y-10">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
               {/* ------------------------------------------------ */}
               {/* Custom Multi-Select “Select Sites” */}
@@ -284,9 +343,9 @@ const GetJobs = () => {
                       Select Job Type
                     </option>
                     <option value="internship">Internship</option>
-                    <option value="full-time">Full-Time</option>
-                    <option value="part-time">Part-Time</option>
-                    <option value="temporary">Temporary</option>
+                    <option value="fulltime">Full-Time</option>
+                    <option value="parttime">Part-Time</option>
+                    <option value="contract">Contract</option>
                   </select>
                   <svg
                     className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400"
@@ -325,11 +384,19 @@ const GetJobs = () => {
             {/* ------------------------------------------------ */}
             <div className="flex justify-between items-center pt-6 border-t border-gray-200">
               <button
-                type="submit"
-                className="inline-flex items-center px-12 py-3 bg-indigo-500 text-white rounded-lg text-sm hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-300 shadow-md"
-              >
-                Search
-              </button>
+                  type="submit"
+                  disabled={isLoading}
+                  className="inline-flex items-center px-12 py-3 bg-indigo-500 text-white rounded-lg text-sm hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-300 shadow-md disabled:opacity-50"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="animate-spin mr-2 h-5 w-5" />
+                      Loading...
+                    </>
+                  ) : (
+                    'Search'
+                  )}
+                </button>
 
               <button
                 type="button"
@@ -344,9 +411,38 @@ const GetJobs = () => {
             {/* Error Message */}
             {/* ------------------------------------------------ */}
             {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
-          </form>
         </div>
+      </motion.form>
+      )}
+      </AnimatePresence>
+      {/* Results */}
+      <div className="flex flex-wrap justify-center gap-6">
+        <AnimatePresence>
+          {submitted &&
+            jobsResult.map((job, idx) => (
+                <JobCard
+                  key={job.id ?? idx}
+                  index={idx}
+                  job={job}
+                />
+              ))
+          }
+        </AnimatePresence>
       </div>
+      {/* Back Button */}
+      {submitted && (
+        <div className="flex justify-center mt-8">
+          <button
+            onClick={() => {
+              setSubmitted(false);
+              setResumeFile(null);
+            }}
+            className="px-12 py-3 bg-gray-300 text-gray-800 rounded-lg text-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 shadow-md"
+          >
+            Back
+          </button>
+        </div>
+      )}
     </div>
   );
 };
@@ -355,4 +451,3 @@ const GetJobs = () => {
 export default GetJobs;
 
 
-// Done until the data comes from backend now, want to change all thing that needed to be showed
