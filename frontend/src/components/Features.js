@@ -54,7 +54,7 @@ const Features = () => {
           </svg>
         </div>
         <div class="flex-grow">
-          <h2 class="text-gray-900 text-lg title-font font-medium mb-3">Find Jobs That Match Your Skills (Coming Soon)</h2>
+          <h2 class="text-gray-900 text-lg title-font font-medium mb-3">Find Jobs That Match Your Skills</h2>
           <p class="leading-relaxed text-base">Upload your resume, and our AI will match your skills with the best job opportunities—bringing you closer to roles that truly fit your expertise.</p>
           {/* <a class="mt-3 text-indigo-500 inline-flex items-center">Learn More
             <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-4 h-4 ml-2" viewBox="0 0 24 24">
