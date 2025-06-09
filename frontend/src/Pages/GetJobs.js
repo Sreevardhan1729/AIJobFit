@@ -17,7 +17,6 @@ const cityOptionsByCountry = {
 };
 
 const JobCard = ({ job, index, jobType }) => {
-  const navigate = useNavigate();
 
   return (
   <motion.div
@@ -30,7 +29,10 @@ const JobCard = ({ job, index, jobType }) => {
   >
     <button
       type="button"
-      onClick={() => navigate(`/get_jobs/${job.id}`, { state: { job } })}
+      onClick={(e)=>{
+        localStorage.setItem(`handoff:${job.id}`, JSON.stringify(job));
+        window.open(`/get_jobs/${job.id}`, "_blank", "noopener,noreferrer");
+      }}
       className="absolute top-6 right-6 rounded-md border border-gray-300 px-4 py-1.5 text-sm font-medium text-gray-600 backdrop-blur transition-colors duration-200 hover:border-gray-400 hover:bg-gray-100 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-300"
     >
       More Details

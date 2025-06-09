@@ -1,7 +1,9 @@
 import FrontImage from "../images/FrontPage.png"
+import { useNavigate } from "react-router-dom";
 const FrontPage = () => {
-  const handleScroll = () => {
-    document.getElementById("features").scrollIntoView({ behavior: "smooth" });
+  const navigate = useNavigate();
+  const handleNavigation = (path) => {
+      navigate(path);
   };
 
   return (
@@ -9,14 +11,15 @@ const FrontPage = () => {
       <div className="max-w-screen-xl mx-auto flex px-10 py-32 md:flex-row flex-col items-center">
         <div className="lg:flex-grow md:w-1/2 lg:pr-32 md:pr-20 flex flex-col text-left mb-16 md:mb-0">
           <h1 className="title-font sm:text-5xl text-4xl mb-6 font-bold text-gray-900">
-            Empowering Your Job Search with AI
+            Find Jobs That Fit You, Not Just Keywords.
           </h1>
           <p className="mb-10 leading-relaxed text-lg">
-            Find out how well your resume matches a job description in seconds! Our AI-powered tool analyzes job postings, compares them with your resume, and highlights missing skills—helping you land the right job faster.
+            Find jobs that match your skills in seconds! Our AI analyzes your resume and connects you with the perfect opportunities.
           </p>
+          <p>👉Get started to upload your Resume</p>
           <div className="flex">
             <button
-              onClick={handleScroll}
+              onClick={()=>handleNavigation('/get_jobs')}
               className="inline-flex text-white bg-indigo-500 border-0 py-3 px-8 text-lg font-semibold rounded-lg shadow-lg hover:bg-indigo-600 transition"
             >
               Get Started

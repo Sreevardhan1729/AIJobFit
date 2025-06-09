@@ -2,8 +2,8 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronUp, Plus, Check } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-/* ────────────────────────────  UTILITIES  ──────────────────────────── */
 
 const Badge = ({ children, variant = "secondary", className = "" }) => {
   const base =
@@ -18,7 +18,7 @@ const Badge = ({ children, variant = "secondary", className = "" }) => {
   );
 };
 
-/** minimal Markdown ⇒ HTML for job description */
+
 const formatDescription = (raw = "") => {
   let html = raw.trim();
   if (!html) return "";
@@ -35,16 +35,19 @@ const formatDescription = (raw = "") => {
   return `<p>${html}</p>`;
 };
 
-/* ────────────────────────────  MAIN PAGE  ──────────────────────────── */
 
 const JobDetailsPage = () => {
-  /* ---------- data sources ---------- */
-  const { state } = useLocation(); // SPA navigation
-  const { id } = useParams(); // /get_jobs/:id
+  const navigate = useNavigate();
+  
+  const handleNavigation = (path) => {
+    navigate(path);
+  };
+  const { state } = useLocation();
+  const { id } = useParams();
   const jobFromState = state?.job;
 
   const jobFromStorage = (() => {
-    const raw = sessionStorage.getItem("selectedJob");
+    const raw = localStorage.getItem(`handoff:${id}`);
     if (!raw) return null;
 
     try {
@@ -59,26 +62,13 @@ const JobDetailsPage = () => {
   const [showDesc, setShowDesc] = useState(true);
   const [selectedUncommon, setSelectedUncommon] = useState(new Set());
 
-  /* ---------- fetch fallback ---------- */
-  useEffect(() => {
-    if (!job && id) {
-      (async () => {
-        try {
-          const res = await fetch(`/api/jobs/${id}`);
-          if (res.ok) setJob(await res.json());
-        } catch (err) {
-          console.error("Failed to fetch job", err);
-        }
-      })();
-    }
-  }, [job, id]);
 
-  /* ✳ optional: clean up sessionStorage once used */
-  useEffect(() => {
-    if (jobFromStorage) sessionStorage.removeItem("selectedJob");
-  }, [jobFromStorage]);
 
-  /* ---------- derived values ---------- */
+  useEffect(() => {
+    if (jobFromStorage) localStorage.removeItem(`handoff:${id}`);
+  }, [jobFromStorage, id]);
+
+
   const commonCount = job?.common_skills?.length ?? 0;
   const selectedCount = selectedUncommon.size;
   const totalUncommon = job?.uncommon_skills?.length ?? 0;
@@ -90,7 +80,7 @@ const JobDetailsPage = () => {
     return Math.round((numerator / denominator) * 100);
   }, [commonCount, selectedCount, remainingUncommon]);
 
-  /* ---------- handlers ---------- */
+
   const toggleSkill = (skill) =>
     setSelectedUncommon((prev) => {
       const next = new Set(prev);
@@ -98,7 +88,7 @@ const JobDetailsPage = () => {
       return next;
     });
 
-  /* ---------- loading ---------- */
+
   if (!job) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -107,19 +97,19 @@ const JobDetailsPage = () => {
     );
   }
 
-  /* ────────────────────────────  RENDER  ──────────────────────────── */
+
 
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-sky-50 via-rose-50 to-violet-50 p-4 md:p-10">
       <div className="mx-auto flex max-w-6xl flex-col gap-6">
-        {/* ─── HEADER ─── */}
+
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.4 }}
           className="relative isolate overflow-hidden rounded-3xl bg-white/80 p-8 shadow-2xl backdrop-blur-lg"
         >
-          {/* decorative blob */}
+
           <div className="pointer-events-none absolute -top-10 -left-10 h-40 w-40 rounded-full bg-gradient-to-br from-blue-500/30 via-indigo-500/20 to-violet-500/20 blur-3xl" />
 
           <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
@@ -157,7 +147,7 @@ const JobDetailsPage = () => {
           </div>
         </motion.div>
 
-        {/* ─── META / SCORE ─── */}
+
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           <div className="col-span-2 flex flex-wrap gap-3 rounded-3xl bg-white/70 p-6 shadow-lg backdrop-blur">
             <Badge>{job.site}</Badge>
@@ -187,7 +177,7 @@ const JobDetailsPage = () => {
           </motion.div>
         </div>
 
-        {/* ─── DESCRIPTION ─── */}
+
         <div className="mt-6 rounded-3xl bg-white p-6 shadow">
           <button
             onClick={() => setShowDesc((v) => !v)}
@@ -212,7 +202,6 @@ const JobDetailsPage = () => {
           </AnimatePresence>
         </div>
 
-        {/* ─── SKILLS ─── */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <SkillBox
             title="Common Skills"
@@ -228,6 +217,14 @@ const JobDetailsPage = () => {
             toggledSet={selectedUncommon}
             onToggle={toggleSkill}
           />
+        </div>
+        <div className="flex justify-center mt-8">
+          <button
+            onClick={() => handleNavigation('/get_jobs')}
+            className="px-12 py-3 bg-gray-300 text-gray-800 rounded-lg text-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 shadow-md"
+          >
+            Back
+          </button>
         </div>
       </div>
     </div>
