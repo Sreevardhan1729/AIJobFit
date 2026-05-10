@@ -100,8 +100,9 @@ export default function JobDetailsPage() {
   const [selectedUncommon, setSelectedUncommon] = useState<Set<string>>(new Set());
 
   React.useEffect(() => {
-    if (jobFromStorage && id) localStorage.removeItem(`handoff:${id}`);
-  }, []);
+    if (id) localStorage.removeItem(`handoff:${id}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   const commonCount = job?.common_skills?.length ?? 0;
   const selectedCount = selectedUncommon.size;
