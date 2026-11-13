@@ -1,13 +1,23 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useJobSearch } from "../hooks/useJobSearch";
 import JobSearchForm from "../components/JobSearchForm";
 import JobCard from "../components/JobCard";
+import SkillGapPanel from "../components/SkillGapPanel";
+import { jobMissesSkill } from "../lib/match";
 
 export default function GetJobs() {
   const navigate = useNavigate();
   const { jobsResult, isLoading, error, submitted, search, reset } = useJobSearch();
+  const [gapFilter, setGapFilter] = useState<string | null>(null);
+
+  const visibleJobs = gapFilter ? jobsResult.filter((job) => jobMissesSkill(job, gapFilter)) : jobsResult;
+
+  const handleBack = () => {
+    setGapFilter(null);
+    reset();
+  };
 
   return (
     <div className="mx-auto max-w-screen-xl px-6 py-16">
@@ -30,10 +40,16 @@ export default function GetJobs() {
         )}
       </AnimatePresence>
 
+      {submitted && <SkillGapPanel jobs={jobsResult} selected={gapFilter} onSelect={setGapFilter} />}
+
+      {submitted && jobsResult.length === 0 && (
+        <p className="text-center text-gray-600">No jobs found. Try a different search.</p>
+      )}
+
       <div className="flex flex-wrap justify-center gap-6">
         <AnimatePresence>
           {submitted &&
-            jobsResult.map((job, idx) => (
+            visibleJobs.map((job, idx) => (
               <JobCard key={job.id ?? idx} index={idx} job={job} />
             ))}
         </AnimatePresence>
@@ -42,7 +58,7 @@ export default function GetJobs() {
       {submitted && (
         <div className="mt-8 flex justify-center">
           <button
-            onClick={reset}
+            onClick={handleBack}
             className="rounded-lg bg-gray-300 px-12 py-3 text-sm text-gray-800 shadow-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300"
           >
             Back

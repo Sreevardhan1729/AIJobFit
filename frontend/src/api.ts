@@ -1,5 +1,13 @@
 import axios from "axios";
-import type { AuthResponse, User, ResumeListResponse, Resume, JobResult, JobSearchParams } from "./types";
+import type {
+  AuthResponse,
+  User,
+  ResumeListResponse,
+  Resume,
+  JobResult,
+  JobSearchParams,
+  MatchResult,
+} from "./types";
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:7860";
 
@@ -20,11 +28,11 @@ export async function getJobSkills(jobDescription: string): Promise<Record<strin
   return response.data;
 }
 
-export async function getComparison(
+export async function getMatch(
   resume: File | null,
   jobDescription: string,
   resumeId?: string
-): Promise<[string[], string[]]> {
+): Promise<MatchResult> {
   const formData = new FormData();
   formData.append("job_description", jobDescription);
   if (resumeId) {
@@ -32,7 +40,7 @@ export async function getComparison(
   } else if (resume) {
     formData.append("resume", resume);
   }
-  const response = await api.post("/compare", formData);
+  const response = await api.post("/match", formData);
   return response.data;
 }
 

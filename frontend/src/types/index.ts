@@ -21,6 +21,37 @@ export interface AuthResponse {
   token_type: string;
 }
 
+export type SkillStatus = "matched" | "partial" | "missing";
+export type Importance = "required" | "preferred";
+export type FitStatus = "meets" | "below" | "unknown";
+
+export interface SkillMatch {
+  name: string;
+  key: string;
+  importance: Importance;
+  weight: number;
+  status: SkillStatus;
+  credit: number;
+  via: string | null;
+  job_term: string;
+  resume_term: string | null;
+}
+
+export interface Tip {
+  skill: string;
+  job_term: string;
+  resume_term: string;
+  message: string;
+}
+
+export interface MatchResult {
+  score: number | null;
+  skills: SkillMatch[];
+  experience: { required_years: number | null; resume_years: number | null; status: FitStatus };
+  education: { required_level: string | null; resume_level: string | null; status: FitStatus };
+  tips: Tip[];
+}
+
 export interface JobResult {
   id: string;
   site: string;
@@ -34,6 +65,7 @@ export interface JobResult {
   similarity_score: number;
   common_skills: string[];
   uncommon_skills: string[];
+  match: MatchResult;
   logo_url?: string;
 }
 

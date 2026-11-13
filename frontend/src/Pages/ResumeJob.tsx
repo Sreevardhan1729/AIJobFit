@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as api from "../api";
+import MatchReport from "../components/MatchReport";
 import ResumeSelector from "../components/ResumeSelector";
+import type { MatchResult } from "../types";
 
 export default function ResumeJob() {
   const navigate = useNavigate();
@@ -9,7 +11,7 @@ export default function ResumeJob() {
   const [resumeId, setResumeId] = useState<string | undefined>();
   const [jobDescription, setJobDescription] = useState("");
   const [error, setError] = useState("");
-  const [result, setResult] = useState<[string[], string[]] | null>(null);
+  const [result, setResult] = useState<MatchResult | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -27,16 +29,16 @@ export default function ResumeJob() {
     }
 
     try {
-      const data = await api.getComparison(resumeFile, jobDescription, resumeId);
+      const data = await api.getMatch(resumeFile, jobDescription, resumeId);
       setResult(data);
       setSubmitted(true);
-    } catch {
-      setError("Error fetching comparison");
+    } catch (err: any) {
+      setError(err?.response?.data?.detail || "Error fetching comparison");
     }
   };
 
   return (
-    <div className="mx-auto max-w-screen-md px-4 py-20">
+    <div className="mx-auto max-w-screen-lg px-4 py-20">
       <h1 className="mb-8 text-3xl font-bold text-gray-800">Job Skill Comparison</h1>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -70,32 +72,8 @@ export default function ResumeJob() {
       {error && <p className="mt-4 text-red-500">{error}</p>}
 
       {submitted && result && (
-        <div className="mt-8 space-y-6">
-          {result[0] && result[0].length > 0 ? (
-            <div>
-              <h3 className="mb-2 text-xl font-semibold text-green-600">Skills in Common</h3>
-              <ul className="list-inside list-disc text-gray-700">
-                {result[0].map((skill, index) => (
-                  <li key={index}>{skill}</li>
-                ))}
-              </ul>
-            </div>
-          ) : (
-            <h3 className="mb-2 text-xl font-semibold text-orange-500">No Skills are Common</h3>
-          )}
-
-          {result[1] && result[1].length > 0 ? (
-            <div>
-              <h3 className="mb-2 text-xl font-semibold text-red-600">Skills Need to be Added</h3>
-              <ul className="list-inside list-disc text-gray-700">
-                {result[1].map((skill, index) => (
-                  <li key={index}>{skill}</li>
-                ))}
-              </ul>
-            </div>
-          ) : (
-            <h3 className="mb-2 text-xl font-semibold text-green-600">All Skills Already Present</h3>
-          )}
+        <div className="mt-8">
+          <MatchReport result={result} />
         </div>
       )}
 

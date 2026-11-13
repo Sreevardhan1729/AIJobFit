@@ -1,7 +1,8 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, ChevronUp, Plus, Check } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import MatchReport from "../components/MatchReport";
 import type { JobResult } from "../types";
 
 function Badge({ children, variant = "secondary", className = "" }: {
@@ -31,52 +32,6 @@ function formatDescription(raw = ""): string {
   return `<p>${html}</p>`;
 }
 
-function SkillBox({ title, skills, badgeClass, type, toggledSet = new Set(), onToggle }: {
-  title: string;
-  skills: string[];
-  badgeClass: string;
-  type: "common" | "uncommon";
-  toggledSet?: Set<string>;
-  onToggle?: (skill: string) => void;
-}) {
-  return (
-    <div className="rounded-3xl bg-white/70 p-6 shadow-lg backdrop-blur">
-      <h3 className="mb-4 flex items-center gap-2 text-lg font-bold text-gray-800">
-        {title}
-        {type === "uncommon" && (
-          <span className="relative inline-flex h-2 w-2">
-            <span className="absolute h-full w-full animate-ping rounded-full bg-rose-400 opacity-75" />
-            <span className="relative h-2 w-2 rounded-full bg-rose-500" />
-          </span>
-        )}
-      </h3>
-      {skills && skills.length > 0 ? (
-        <ul className="flex flex-wrap gap-2">
-          {skills.map((skill) => {
-            const isSelected = toggledSet.has(skill);
-            const base = isSelected ? "bg-emerald-100 text-emerald-700" : badgeClass;
-            const pulse = !isSelected && type === "uncommon" ? "animate-pulse" : "";
-            return (
-              <motion.li
-                key={skill}
-                whileTap={{ scale: 0.9 }}
-                onClick={type === "uncommon" ? () => onToggle?.(skill) : undefined}
-                className={`inline-flex cursor-pointer items-center gap-1 rounded-full px-3 py-1 text-xs font-medium shadow transition-transform duration-150 hover:-translate-y-0.5 ${base} ${pulse} ${type === "uncommon" ? "ring-1 ring-rose-300 hover:ring-2" : ""}`}
-              >
-                {type === "uncommon" && !isSelected && <Plus size={12} />}
-                {type === "uncommon" && isSelected && <Check size={12} />}
-                {skill}
-              </motion.li>
-            );
-          })}
-        </ul>
-      ) : (
-        <p className="text-sm text-gray-500">No data</p>
-      )}
-    </div>
-  );
-}
-
 export default function JobDetailsPage() {
   const navigate = useNavigate();
   const { state } = useLocation();
@@ -97,30 +52,11 @@ export default function JobDetailsPage() {
 
   const [job] = useState<JobResult | null>(jobFromState || jobFromStorage || null);
   const [showDesc, setShowDesc] = useState(true);
-  const [selectedUncommon, setSelectedUncommon] = useState<Set<string>>(new Set());
 
   React.useEffect(() => {
     if (id) localStorage.removeItem(`handoff:${id}`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
-
-  const commonCount = job?.common_skills?.length ?? 0;
-  const selectedCount = selectedUncommon.size;
-  const totalUncommon = job?.uncommon_skills?.length ?? 0;
-  const remainingUncommon = totalUncommon - selectedCount;
-
-  const score = useMemo(() => {
-    const numerator = commonCount * 2 + selectedCount * 2 + 1;
-    const denominator = commonCount * 2 + selectedCount * 2 + remainingUncommon + 1;
-    return Math.round((numerator / denominator) * 100);
-  }, [commonCount, selectedCount, remainingUncommon]);
-
-  const toggleSkill = (skill: string) =>
-    setSelectedUncommon((prev) => {
-      const next = new Set(prev);
-      next.has(skill) ? next.delete(skill) : next.add(skill);
-      return next;
-    });
 
   if (!job) {
     return (
@@ -169,27 +105,15 @@ export default function JobDetailsPage() {
           </div>
         </motion.div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          <div className="col-span-2 flex flex-wrap gap-3 rounded-3xl bg-white/70 p-6 shadow-lg backdrop-blur">
-            <Badge>{job.site}</Badge>
-            {job.location && <Badge>{job.location}</Badge>}
-            {job.job_type && <Badge>{job.job_type}</Badge>}
-            {job.date_posted && (
-              <Badge>
-                Posted {new Date(job.date_posted).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
-              </Badge>
-            )}
-          </div>
-          <motion.div
-            key={score}
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: "spring", stiffness: 220, damping: 15 }}
-            className="flex items-center justify-center rounded-3xl bg-gradient-to-br from-emerald-100 to-emerald-50 p-6 shadow-lg backdrop-blur"
-          >
-            <span className="text-4xl font-extrabold text-emerald-600">{score}%</span>
-            <span className="ml-2 text-sm font-medium text-emerald-700">Match</span>
-          </motion.div>
+        <div className="flex flex-wrap gap-3 rounded-3xl bg-white/70 p-6 shadow-lg backdrop-blur">
+          <Badge>{job.site}</Badge>
+          {job.location && <Badge>{job.location}</Badge>}
+          {job.job_type && <Badge>{job.job_type}</Badge>}
+          {job.date_posted && (
+            <Badge>
+              Posted {new Date(job.date_posted).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+            </Badge>
+          )}
         </div>
 
         <div className="mt-6 rounded-3xl bg-white p-6 shadow">
@@ -215,17 +139,7 @@ export default function JobDetailsPage() {
           </AnimatePresence>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <SkillBox title="Common Skills" skills={job.common_skills} badgeClass="bg-emerald-100 text-emerald-700" type="common" />
-          <SkillBox
-            title="Uncommon Skills (click to add)"
-            skills={job.uncommon_skills}
-            badgeClass="bg-rose-100 text-rose-700"
-            type="uncommon"
-            toggledSet={selectedUncommon}
-            onToggle={toggleSkill}
-          />
-        </div>
+        <MatchReport result={job.match} />
 
         <div className="mt-8 flex justify-center">
           <button
