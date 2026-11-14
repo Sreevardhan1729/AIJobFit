@@ -1,11 +1,32 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import * as api from "../api";
+import Button from "../components/ui/Button";
+import Card from "../components/ui/Card";
+import Chip from "../components/ui/Chip";
+import { FIELD, LABEL } from "../components/ui/fieldStyles";
+import { SAMPLE_JOB_TEXT } from "../data/sampleJob";
+
+// Display names for the model's labels; anything else is shown as-is.
+const LABEL_NAMES: Record<string, string> = {
+  EDUCATION: "Education",
+  SOFTSKILLS: "Soft skills",
+  LANGUAGE: "Languages",
+  DOMAIN: "Domain",
+  DEVELOP: "Development",
+  RESPONSIBILITY: "Responsibilities",
+};
+
+const FIRST_GROUPS = ["Required Skills", "Preferred Skills", "Experience"];
+
+function orderedGroups(details: Record<string, string[]>): [string, string[]][] {
+  const rank = (key: string) => (FIRST_GROUPS.includes(key) ? FIRST_GROUPS.indexOf(key) : FIRST_GROUPS.length);
+  return Object.entries(details).sort(([a], [b]) => rank(a) - rank(b));
+}
 
 export default function Job() {
-  const navigate = useNavigate();
   const [jobDescription, setJobDescription] = useState("");
   const [jobDetails, setJobDetails] = useState<Record<string, string[]> | null>(null);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -13,71 +34,87 @@ export default function Job() {
     setError("");
     setJobDetails(null);
     if (!jobDescription.trim()) {
-      setError("Please enter Job Description");
+      setError("Please enter a job description.");
       return;
     }
+    setLoading(true);
     try {
       const data = await api.getJobSkills(jobDescription);
       setJobDetails(data);
     } catch {
       setError("Error fetching job details");
+    } finally {
+      setLoading(false);
     }
   };
 
+  const groups = jobDetails ? orderedGroups(jobDetails) : [];
+
   return (
-    <div className="mx-auto max-w-screen-md px-4 py-20">
-      <h1 className="mb-8 text-3xl font-bold text-gray-800">Analyze Job Requirements</h1>
+    <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
+      <p className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-300">Analyze</p>
+      <h1 className="mt-2 text-3xl font-bold text-slate-100">Analyze a job description</h1>
+      <p className="mt-2 max-w-2xl text-slate-400">
+        Pull out the required and preferred skills, the experience asked for, and the other requirements.
+      </p>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label className="mb-2 block font-medium text-gray-700">Job Description:</label>
-          <textarea
-            value={jobDescription}
-            onChange={(e) => setJobDescription(e.target.value)}
-            rows={6}
-            placeholder="Paste the Job Description Here"
-            className="w-full rounded border border-gray-300 p-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-300"
-            style={{ minHeight: "100px", maxHeight: "300px", overflowY: "auto" }}
-          />
-        </div>
-        <button
-          type="submit"
-          className="inline-flex items-center rounded bg-indigo-500 px-6 py-2 text-white shadow hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-300"
-        >
-          Get Your Dream Job
-        </button>
-      </form>
-
-      {error && <p className="mt-4 text-red-500">{error}</p>}
+      <Card className="mt-8">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <div className="mb-2 flex items-center justify-between">
+              <label htmlFor="analyze-job" className={`${LABEL} mb-0`}>
+                Job description
+              </label>
+              <button
+                type="button"
+                onClick={() => setJobDescription(SAMPLE_JOB_TEXT)}
+                className="text-sm font-medium text-indigo-300 hover:text-indigo-200"
+              >
+                Use the sample job
+              </button>
+            </div>
+            <textarea
+              id="analyze-job"
+              value={jobDescription}
+              onChange={(e) => setJobDescription(e.target.value)}
+              rows={8}
+              placeholder="Paste the job description here"
+              className={`${FIELD} leading-relaxed`}
+            />
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button type="submit" loading={loading}>
+              Analyze job
+            </Button>
+            {error && <p className="text-sm text-rose-300">{error}</p>}
+          </div>
+        </form>
+      </Card>
 
       {jobDetails && (
-        <div className="mt-10">
-          <h2 className="mb-4 text-2xl font-semibold">Job Requirements</h2>
-          {Object.entries(jobDetails).map(([key, values]) => (
-            <div key={key} className="mb-6">
-              <h3 className="text-xl font-medium text-gray-800">
-                {key.charAt(0).toUpperCase() + key.slice(1)}
-              </h3>
-              {values.length > 0 ? (
-                <ul className="mt-2 list-inside list-disc space-y-1">
-                  {values.map((item, index) => (
-                    <li key={index} className="text-gray-700">{item}</li>
+        <div className="mt-8 space-y-4">
+          {groups.length === 0 ? (
+            <Card>
+              <p className="text-sm text-slate-400">No skills or requirements found in this job description.</p>
+            </Card>
+          ) : (
+            groups.map(([key, values]) => (
+              <Card key={key}>
+                <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-400">
+                  {LABEL_NAMES[key] ?? key}
+                </h2>
+                <div className="flex flex-wrap gap-2">
+                  {values.map((value) => (
+                    <Chip key={value} tone={key === "Required Skills" ? "brand" : "neutral"}>
+                      {value}
+                    </Chip>
                   ))}
-                </ul>
-              ) : (
-                <p className="text-gray-600">No {key} found.</p>
-              )}
-            </div>
-          ))}
+                </div>
+              </Card>
+            ))
+          )}
         </div>
       )}
-
-      <button
-        className="mt-8 inline-flex items-center rounded bg-gray-300 px-6 py-2 text-gray-800 hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300"
-        onClick={() => navigate("/")}
-      >
-        Back to Home
-      </button>
     </div>
   );
 }

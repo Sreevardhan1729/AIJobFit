@@ -1,18 +1,38 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import * as api from "../api";
 import MatchReport from "../components/MatchReport";
 import ResumeSelector from "../components/ResumeSelector";
+import Button from "../components/ui/Button";
+import Card from "../components/ui/Card";
+import { FIELD, LABEL } from "../components/ui/fieldStyles";
+import { loadSampleResumeFile } from "../data/loadSampleResume";
+import { SAMPLE_JOB_TEXT } from "../data/sampleJob";
 import type { MatchResult } from "../types";
 
 export default function ResumeJob() {
-  const navigate = useNavigate();
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [resumeId, setResumeId] = useState<string | undefined>();
   const [jobDescription, setJobDescription] = useState("");
+  // While the sample resume is the selected file, runs must not attach the visitor's login, or the
+  // backend saves the sample as their resume. Only picking another resume clears this; editing the
+  // job text doesn't change which file is sent.
+  const [usingSample, setUsingSample] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<MatchResult | null>(null);
-  const [submitted, setSubmitted] = useState(false);
+
+  const trySample = async () => {
+    setError("");
+    try {
+      const file = await loadSampleResumeFile();
+      setResumeFile(file);
+      setResumeId(undefined);
+      setJobDescription(SAMPLE_JOB_TEXT);
+      setUsingSample(true);
+    } catch {
+      setError("Couldn't load the sample resume. Please try again.");
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,65 +44,87 @@ export default function ResumeJob() {
       return;
     }
     if (!jobDescription.trim()) {
-      setError("Please enter a Job Description.");
+      setError("Please enter a job description.");
       return;
     }
 
+    setLoading(true);
     try {
-      const data = await api.getMatch(resumeFile, jobDescription, resumeId);
+      const options = usingSample ? { anonymous: true } : undefined;
+      const data = await api.getMatch(resumeFile, jobDescription, resumeId, options);
       setResult(data);
-      setSubmitted(true);
     } catch (err: any) {
       setError(err?.response?.data?.detail || "Error fetching comparison");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="mx-auto max-w-screen-lg px-4 py-20">
-      <h1 className="mb-8 text-3xl font-bold text-gray-800">Job Skill Comparison</h1>
+    <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
+      <p className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-300">Compare</p>
+      <h1 className="mt-2 text-3xl font-bold text-slate-100">Compare a resume with a job</h1>
+      <p className="mt-2 max-w-2xl text-slate-400">
+        See which of the job's skills your resume already covers, which are close, and which are missing.
+      </p>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <ResumeSelector
-          onResumeSelect={(id) => { setResumeId(id); setResumeFile(null); }}
-          onFileSelect={(file) => { setResumeFile(file); setResumeId(undefined); }}
-          selectedResumeId={resumeId}
-          selectedFile={resumeFile}
-        />
+      <Card className="mt-8">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <div className="mb-2 flex items-center justify-between">
+              <span className={`${LABEL} mb-0`}>Resume</span>
+              <button
+                type="button"
+                onClick={trySample}
+                className="text-sm font-medium text-indigo-300 hover:text-indigo-200"
+              >
+                Try the sample
+              </button>
+            </div>
+            <ResumeSelector
+              onResumeSelect={(id) => {
+                setResumeId(id);
+                setResumeFile(null);
+                setUsingSample(false);
+              }}
+              onFileSelect={(file) => {
+                setResumeFile(file);
+                setResumeId(undefined);
+                setUsingSample(false);
+              }}
+              selectedResumeId={resumeId}
+              selectedFile={resumeFile}
+            />
+          </div>
 
-        <div>
-          <label className="mb-2 block font-medium text-gray-700">Job Description</label>
-          <textarea
-            value={jobDescription}
-            onChange={(e) => setJobDescription(e.target.value)}
-            rows={6}
-            placeholder="Paste the Job Description Here"
-            className="w-full rounded border border-gray-300 p-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-300"
-            style={{ minHeight: "100px", maxHeight: "300px", overflowY: "auto" }}
-          />
-        </div>
+          <div>
+            <label htmlFor="job-description" className={LABEL}>
+              Job description
+            </label>
+            <textarea
+              id="job-description"
+              value={jobDescription}
+              onChange={(e) => setJobDescription(e.target.value)}
+              rows={8}
+              placeholder="Paste the job description here"
+              className={`${FIELD} leading-relaxed`}
+            />
+          </div>
 
-        <button
-          type="submit"
-          className="inline-flex items-center rounded bg-indigo-500 px-6 py-2 text-white shadow hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-300"
-        >
-          Compare Skills
-        </button>
-      </form>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button type="submit" loading={loading}>
+              Compare skills
+            </Button>
+            {error && <p className="text-sm text-rose-300">{error}</p>}
+          </div>
+        </form>
+      </Card>
 
-      {error && <p className="mt-4 text-red-500">{error}</p>}
-
-      {submitted && result && (
+      {result && (
         <div className="mt-8">
           <MatchReport result={result} />
         </div>
       )}
-
-      <button
-        className="mt-8 inline-flex items-center rounded bg-gray-300 px-6 py-2 text-gray-800 hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300"
-        onClick={() => navigate("/")}
-      >
-        Back to Home
-      </button>
     </div>
   );
 }

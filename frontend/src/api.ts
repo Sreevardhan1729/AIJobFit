@@ -13,6 +13,10 @@ const API_URL = process.env.REACT_APP_API_URL || "http://localhost:7860";
 
 const api = axios.create({ baseURL: API_URL });
 
+// No auth interceptor: sample runs must never send the visitor's token, or the backend would
+// save the sample as their resume (and replace their real one).
+const publicApi = axios.create({ baseURL: API_URL, timeout: 90000 });
+
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
@@ -31,7 +35,8 @@ export async function getJobSkills(jobDescription: string): Promise<Record<strin
 export async function getMatch(
   resume: File | null,
   jobDescription: string,
-  resumeId?: string
+  resumeId?: string,
+  options: { anonymous?: boolean } = {}
 ): Promise<MatchResult> {
   const formData = new FormData();
   formData.append("job_description", jobDescription);
@@ -40,7 +45,8 @@ export async function getMatch(
   } else if (resume) {
     formData.append("resume", resume);
   }
-  const response = await api.post("/match", formData);
+  const client = options.anonymous ? publicApi : api;
+  const response = await client.post("/match", formData);
   return response.data;
 }
 

@@ -28,14 +28,36 @@ const result: MatchResult = {
   tips: [{ skill: "Python", job_term: "Python", resume_term: "py", message: "Use the job's wording." }],
 };
 
-test("shows the score, partial source, experience row and tips", () => {
+test("shows score, band, caption, partial source, experience and tips", () => {
   render(<MatchReport result={result} />);
   expect(screen.getByText("50%")).toBeInTheDocument();
+  expect(screen.getByText("Good match")).toBeInTheDocument();
+  expect(screen.getByText("Estimate from skill overlap, not an employer's ATS score.")).toBeInTheDocument();
   expect(screen.getByText("via PyTorch")).toBeInTheDocument();
   expect(screen.getByText("preferred")).toBeInTheDocument();
-  expect(screen.getByText(/Job asks 3\+ yrs/)).toHaveTextContent("~2.5 yrs (estimate)");
+  expect(screen.getByText("Job asks: 3+ yrs")).toBeInTheDocument();
+  expect(screen.getByText("Your resume: ~2.5 yrs (estimate)")).toBeInTheDocument();
   expect(screen.queryByText("Education")).not.toBeInTheDocument();
   expect(screen.getByText("Use the job's wording.")).toBeInTheDocument();
+});
+
+test("breakdown adds up and follows what-if marks", () => {
+  render(<MatchReport result={result} />);
+  fireEvent.click(screen.getByRole("button", { name: "How this is scored" }));
+  expect(screen.getByText("You have 1.25 of 2.5 points → 50%.")).toBeInTheDocument();
+  expect(
+    screen.getByText("Required: 1 matched, 0 partial of 2 · Preferred: 0 matched, 1 partial of 1")
+  ).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: /Docker/ }));
+  expect(screen.getByText("You have 2.25 of 2.5 points → 90%.")).toBeInTheDocument();
+  expect(screen.getByText("Strong match")).toBeInTheDocument();
+});
+
+test("hint only when something can be marked", () => {
+  const { rerender } = render(<MatchReport result={result} />);
+  expect(screen.getByText(/only if you really have it/)).toBeInTheDocument();
+  rerender(<MatchReport result={{ ...result, skills: [result.skills[0]] }} />);
+  expect(screen.queryByText(/only if you really have it/)).not.toBeInTheDocument();
 });
 
 test("marking a missing skill recomputes the score", () => {

@@ -39,3 +39,87 @@ export function aggregateGaps(jobs: JobResult[], limit = 8): SkillGap[] {
 export function jobMissesSkill(job: JobResult, key: string): boolean {
   return (job.match?.skills ?? []).some((skill) => skill.key === key && isGap(skill));
 }
+
+export type Tone = "emerald" | "teal" | "amber" | "rose";
+
+export function matchLabel(score: number | null): { label: string; tone: Tone } | null {
+  if (score === null) return null;
+  if (score >= 70) return { label: "Strong match", tone: "emerald" };
+  if (score >= 45) return { label: "Good match", tone: "teal" };
+  if (score >= 25) return { label: "Fair match", tone: "amber" };
+  return { label: "Low match", tone: "rose" };
+}
+
+export interface GroupCount {
+  matched: number;
+  partial: number;
+  total: number;
+}
+
+export interface ScoreBreakdown {
+  earned: number;
+  total: number;
+  score: number | null;
+  required: GroupCount;
+  preferred: GroupCount;
+}
+
+export function scoreBreakdown(skills: SkillMatch[], have: ReadonlySet<string> = new Set()): ScoreBreakdown {
+  const required: GroupCount = { matched: 0, partial: 0, total: 0 };
+  const preferred: GroupCount = { matched: 0, partial: 0, total: 0 };
+  let total = 0;
+  let earned = 0;
+  for (const skill of skills) {
+    const credit = have.has(skill.key) ? 1 : skill.credit;
+    total += skill.weight;
+    earned += skill.weight * credit;
+    const group = skill.importance === "required" ? required : preferred;
+    group.total += 1;
+    if (credit === 1) group.matched += 1;
+    else if (credit > 0) group.partial += 1;
+  }
+  return { earned, total, score: computeScore(skills, have), required, preferred };
+}
+
+export function skillPreview(skills: SkillMatch[], n = 3): { matches: string[]; missing: string[] } {
+  const ordered = [
+    ...skills.filter((skill) => skill.importance === "required"),
+    ...skills.filter((skill) => skill.importance !== "required"),
+  ];
+  const names = (status: SkillMatch["status"]) =>
+    ordered.filter((skill) => skill.status === status).slice(0, n).map((skill) => skill.name);
+  return { matches: names("matched"), missing: names("missing") };
+}
+
+// Hints driven by elapsed time: the backend does the whole search in one request.
+const SEARCH_STAGES: [number, string][] = [
+  [20, "Scoring against your resume…"],
+  [8, "Reading job descriptions…"],
+  [0, "Searching LinkedIn / Indeed…"],
+];
+
+export function searchStage(elapsedSeconds: number): string {
+  const stage = SEARCH_STAGES.find(([startsAt]) => elapsedSeconds >= startsAt) ?? SEARCH_STAGES[SEARCH_STAGES.length - 1];
+  return stage[1];
+}
+
+export interface SearchFields {
+  hasResume: boolean;
+  searchTerm: string;
+  country: string;
+  city: string;
+  jobType: string;
+  sites: string[];
+}
+
+// What the job search still needs, in the order the form asks for it.
+export function missingFields(fields: SearchFields): string[] {
+  const missing: string[] = [];
+  if (!fields.hasResume) missing.push("your resume");
+  if (!fields.searchTerm.trim()) missing.push("a job title");
+  if (!fields.country) missing.push("a country");
+  if (!fields.city) missing.push("a city");
+  if (!fields.jobType) missing.push("a job type");
+  if (fields.sites.length === 0) missing.push("at least one source");
+  return missing;
+}

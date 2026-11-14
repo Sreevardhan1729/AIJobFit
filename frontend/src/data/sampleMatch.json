@@ -1,0 +1,309 @@
+{
+  "score": 44,
+  "skills": [
+    {
+      "name": "A/B Testing",
+      "key": "abtesting",
+      "importance": "required",
+      "weight": 1.0,
+      "status": "missing",
+      "credit": 0.0,
+      "via": null,
+      "job_term": "A/B testing",
+      "resume_term": null
+    },
+    {
+      "name": "Artificial Intelligence",
+      "key": "artificialintelligence",
+      "importance": "required",
+      "weight": 1.0,
+      "status": "missing",
+      "credit": 0.0,
+      "via": null,
+      "job_term": "AI",
+      "resume_term": null
+    },
+    {
+      "name": "AWS",
+      "key": "aws",
+      "importance": "required",
+      "weight": 1.0,
+      "status": "matched",
+      "credit": 1.0,
+      "via": null,
+      "job_term": "AWS",
+      "resume_term": "AWS"
+    },
+    {
+      "name": "Azure",
+      "key": "azure",
+      "importance": "required",
+      "weight": 1.0,
+      "status": "partial",
+      "credit": 0.5,
+      "via": "AWS",
+      "job_term": "Azure",
+      "resume_term": null
+    },
+    {
+      "name": "Cloud Platforms",
+      "key": "cloudplatforms",
+      "importance": "required",
+      "weight": 1.0,
+      "status": "missing",
+      "credit": 0.0,
+      "via": null,
+      "job_term": "cloud platforms",
+      "resume_term": null
+    },
+    {
+      "name": "Computer Vision",
+      "key": "computervision",
+      "importance": "required",
+      "weight": 1.0,
+      "status": "matched",
+      "credit": 1.0,
+      "via": null,
+      "job_term": "computer vision",
+      "resume_term": "computer-vision"
+    },
+    {
+      "name": "Data Science",
+      "key": "datascience",
+      "importance": "required",
+      "weight": 1.0,
+      "status": "missing",
+      "credit": 0.0,
+      "via": null,
+      "job_term": "Data Science",
+      "resume_term": null
+    },
+    {
+      "name": "Deep Learning",
+      "key": "deeplearning",
+      "importance": "required",
+      "weight": 1.0,
+      "status": "missing",
+      "credit": 0.0,
+      "via": null,
+      "job_term": "deep learning",
+      "resume_term": null
+    },
+    {
+      "name": "Face Recognition",
+      "key": "facerecognition",
+      "importance": "required",
+      "weight": 1.0,
+      "status": "missing",
+      "credit": 0.0,
+      "via": null,
+      "job_term": "facial recognition",
+      "resume_term": null
+    },
+    {
+      "name": "GCP",
+      "key": "gcp",
+      "importance": "required",
+      "weight": 1.0,
+      "status": "partial",
+      "credit": 0.5,
+      "via": "AWS",
+      "job_term": "GCP",
+      "resume_term": null
+    },
+    {
+      "name": "Image Processing",
+      "key": "imageprocessing",
+      "importance": "required",
+      "weight": 1.0,
+      "status": "missing",
+      "credit": 0.0,
+      "via": null,
+      "job_term": "image processing",
+      "resume_term": null
+    },
+    {
+      "name": "Machine Learning",
+      "key": "machinelearning",
+      "importance": "required",
+      "weight": 1.0,
+      "status": "matched",
+      "credit": 1.0,
+      "via": null,
+      "job_term": "ML",
+      "resume_term": "Machine Learning"
+    },
+    {
+      "name": "MLOps",
+      "key": "mlops",
+      "importance": "required",
+      "weight": 1.0,
+      "status": "missing",
+      "credit": 0.0,
+      "via": null,
+      "job_term": "MLOps",
+      "resume_term": null
+    },
+    {
+      "name": "NLP",
+      "key": "nlp",
+      "importance": "required",
+      "weight": 1.0,
+      "status": "missing",
+      "credit": 0.0,
+      "via": null,
+      "job_term": "NLP",
+      "resume_term": null
+    },
+    {
+      "name": "NumPy",
+      "key": "numpy",
+      "importance": "required",
+      "weight": 1.0,
+      "status": "matched",
+      "credit": 1.0,
+      "via": null,
+      "job_term": "NumPy",
+      "resume_term": "NumPy"
+    },
+    {
+      "name": "OpenCV",
+      "key": "opencv",
+      "importance": "required",
+      "weight": 1.0,
+      "status": "matched",
+      "credit": 1.0,
+      "via": null,
+      "job_term": "OpenCV",
+      "resume_term": "OpenCV"
+    },
+    {
+      "name": "Pandas",
+      "key": "pandas",
+      "importance": "required",
+      "weight": 1.0,
+      "status": "matched",
+      "credit": 1.0,
+      "via": null,
+      "job_term": "Pandas",
+      "resume_term": "Pandas"
+    },
+    {
+      "name": "Python",
+      "key": "python",
+      "importance": "required",
+      "weight": 1.0,
+      "status": "matched",
+      "credit": 1.0,
+      "via": null,
+      "job_term": "Python",
+      "resume_term": "Python"
+    },
+    {
+      "name": "PyTorch",
+      "key": "pytorch",
+      "importance": "required",
+      "weight": 1.0,
+      "status": "matched",
+      "credit": 1.0,
+      "via": null,
+      "job_term": "PyTorch",
+      "resume_term": "PyTorch"
+    },
+    {
+      "name": "Recommendation Systems",
+      "key": "recommendationsystems",
+      "importance": "required",
+      "weight": 1.0,
+      "status": "missing",
+      "credit": 0.0,
+      "via": null,
+      "job_term": "recommendation systems",
+      "resume_term": null
+    },
+    {
+      "name": "Scikit-learn",
+      "key": "scikitlearn",
+      "importance": "required",
+      "weight": 1.0,
+      "status": "matched",
+      "credit": 1.0,
+      "via": null,
+      "job_term": "Scikit-Learn",
+      "resume_term": "sklearn"
+    },
+    {
+      "name": "TensorFlow",
+      "key": "tensorflow",
+      "importance": "required",
+      "weight": 1.0,
+      "status": "partial",
+      "credit": 0.5,
+      "via": "PyTorch",
+      "job_term": "TensorFlow",
+      "resume_term": null
+    },
+    {
+      "name": "Collaborative Filtering",
+      "key": "collaborativefiltering",
+      "importance": "preferred",
+      "weight": 0.5,
+      "status": "missing",
+      "credit": 0.0,
+      "via": null,
+      "job_term": "Collaborative Filtering",
+      "resume_term": null
+    },
+    {
+      "name": "Dlib",
+      "key": "dlib",
+      "importance": "preferred",
+      "weight": 0.5,
+      "status": "missing",
+      "credit": 0.0,
+      "via": null,
+      "job_term": "Dlib",
+      "resume_term": null
+    },
+    {
+      "name": "MediaPipe",
+      "key": "mediapipe",
+      "importance": "preferred",
+      "weight": 0.5,
+      "status": "missing",
+      "credit": 0.0,
+      "via": null,
+      "job_term": "Mediapipe",
+      "resume_term": null
+    },
+    {
+      "name": "REST API",
+      "key": "restapi",
+      "importance": "preferred",
+      "weight": 0.5,
+      "status": "missing",
+      "credit": 0.0,
+      "via": null,
+      "job_term": "REST API",
+      "resume_term": null
+    }
+  ],
+  "experience": {
+    "required_years": 3,
+    "resume_years": 4.2,
+    "status": "meets"
+  },
+  "education": {
+    "required_level": "Bachelor's",
+    "resume_level": "Master's",
+    "status": "meets"
+  },
+  "tips": [
+    {
+      "skill": "Scikit-learn",
+      "job_term": "Scikit-Learn",
+      "resume_term": "sklearn",
+      "message": "This job says \"Scikit-Learn\"; your resume says \"sklearn\". Using the job's exact wording helps with keyword filters."
+    }
+  ]
+}

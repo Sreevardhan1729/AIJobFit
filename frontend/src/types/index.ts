@@ -65,7 +65,8 @@ export interface JobResult {
   similarity_score: number;
   common_skills: string[];
   uncommon_skills: string[];
-  match: MatchResult;
+  // Optional: details handed off from an older build (localStorage) may not have it.
+  match?: MatchResult;
   logo_url?: string;
 }
 

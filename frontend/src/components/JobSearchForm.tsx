@@ -1,202 +1,173 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Loader2 } from "lucide-react";
+import React, { useState } from "react";
+import { Check, Search } from "lucide-react";
 import { SITE_OPTIONS, CITY_OPTIONS_BY_COUNTRY, COUNTRIES, JOB_TYPES } from "../constants";
+import type { JobSearchInput } from "../hooks/useJobSearch";
+import { missingFields } from "../lib/match";
 import ResumeSelector from "./ResumeSelector";
+import Button from "./ui/Button";
+import { FIELD, LABEL } from "./ui/fieldStyles";
+import Select from "./ui/Select";
 
 interface JobSearchFormProps {
-  onSubmit: (params: {
-    selectedSites: string[];
-    searchTerm: string;
-    country: string;
-    city: string;
-    jobType: string;
-    resumeFile: File | null;
-    resumeId?: string;
-  }) => void;
+  onSubmit: (params: JobSearchInput) => void;
   isLoading: boolean;
   error: string;
-  onBack: () => void;
 }
 
-export default function JobSearchForm({ onSubmit, isLoading, error, onBack }: JobSearchFormProps) {
-  const [selectedSites, setSelectedSites] = useState<string[]>([]);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+// Defaults so a first search rarely fails validation: both sources, full-time, the author's market.
+const DEFAULT_SITES = SITE_OPTIONS.map((opt) => opt.value as string);
+const DEFAULT_JOB_TYPE = "fulltime";
+const DEFAULT_COUNTRY = "India";
+
+function Step({ number, title, children }: { number: number; title: string; children: React.ReactNode }) {
+  return (
+    <section className="flex gap-4">
+      <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-sm font-bold text-white">
+        {number}
+      </span>
+      <div className="min-w-0 flex-1">
+        <h2 className="mb-3 text-base font-semibold text-slate-100">{title}</h2>
+        {children}
+      </div>
+    </section>
+  );
+}
+
+export default function JobSearchForm({ onSubmit, isLoading, error }: JobSearchFormProps) {
+  const [selectedSites, setSelectedSites] = useState<string[]>(DEFAULT_SITES);
   const [searchTerm, setSearchTerm] = useState("");
-  const [country, setCountry] = useState("");
+  const [country, setCountry] = useState(DEFAULT_COUNTRY);
   const [city, setCity] = useState("");
-  const [jobType, setJobType] = useState("");
+  const [jobType, setJobType] = useState(DEFAULT_JOB_TYPE);
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [resumeId, setResumeId] = useState<string | undefined>();
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setIsDropdownOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  const [missing, setMissing] = useState<string[]>([]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const stillNeeded = missingFields({
+      hasResume: Boolean(resumeFile || resumeId),
+      searchTerm,
+      country,
+      city,
+      jobType,
+      sites: selectedSites,
+    });
+    setMissing(stillNeeded);
+    if (stillNeeded.length > 0) return;
     onSubmit({ selectedSites, searchTerm, country, city, jobType, resumeFile, resumeId });
   };
 
-  const handleSiteToggle = (value: string) => {
-    setSelectedSites((prev) =>
-      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
-    );
-  };
-
-  const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setCountry(e.target.value);
-    setCity("");
-  };
+  const toggleSite = (value: string) =>
+    setSelectedSites((prev) => (prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]));
 
   const availableCities = country ? CITY_OPTIONS_BY_COUNTRY[country] || [] : [];
 
   return (
-    <form onSubmit={handleSubmit} className="mx-auto max-w-3xl overflow-hidden rounded-lg bg-white shadow-2xl">
-      <div className="space-y-10 p-10">
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
-          {/* Site multi-select */}
-          <div ref={dropdownRef} className="relative">
-            <label className="mb-2 block text-sm font-medium text-gray-700">Select Sites:</label>
-            <div
-              className="flex w-full cursor-pointer items-center justify-between rounded-lg border border-gray-300 bg-gray-50 p-3 text-sm text-gray-700 transition-colors hover:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-300"
-              onClick={() => setIsDropdownOpen((p) => !p)}
-            >
-              <span>
-                {selectedSites.length > 0
-                  ? SITE_OPTIONS.filter((opt) => selectedSites.includes(opt.value))
-                      .map((opt) => opt.label)
-                      .join(", ")
-                  : "Choose sites"}
-              </span>
-              <svg
-                className={`h-5 w-5 transform text-gray-600 transition-transform ${isDropdownOpen ? "rotate-180" : ""}`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
-            {isDropdownOpen && (
-              <div className="absolute z-10 mt-2 max-h-48 w-full overflow-auto rounded-lg border border-gray-300 bg-white shadow-lg">
-                {SITE_OPTIONS.map((opt) => (
-                  <label key={opt.value} className="flex cursor-pointer items-center px-4 py-3 text-sm hover:bg-gray-100">
-                    <input
-                      type="checkbox"
-                      value={opt.value}
-                      checked={selectedSites.includes(opt.value)}
-                      onChange={() => handleSiteToggle(opt.value)}
-                      className="form-checkbox h-5 w-5 rounded text-indigo-600"
-                    />
-                    <span className="ml-3 text-gray-700">{opt.label}</span>
-                  </label>
-                ))}
-              </div>
-            )}
-          </div>
+    <form
+      onSubmit={handleSubmit}
+      noValidate
+      className="mx-auto max-w-4xl space-y-8 rounded-2xl border border-slate-800 bg-slate-900/80 p-6 sm:p-8"
+    >
+      <Step number={1} title="Your resume">
+        <ResumeSelector
+          onResumeSelect={(id) => {
+            setResumeId(id);
+            setResumeFile(null);
+          }}
+          onFileSelect={(file) => {
+            setResumeFile(file);
+            setResumeId(undefined);
+          }}
+          selectedResumeId={resumeId}
+          selectedFile={resumeFile}
+        />
+      </Step>
 
-          {/* Search term */}
-          <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">Job Title / Keyword:</label>
+      <Step number={2} title="What and where">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr]">
+          <div className="sm:col-span-2 lg:col-span-1">
+            <label htmlFor="search-term" className={LABEL}>Job title or keyword</label>
             <input
+              id="search-term"
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="e.g., Software Engineer"
-              className="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+              placeholder="e.g., Machine Learning Engineer"
+              className={FIELD}
             />
           </div>
-
-          {/* Country */}
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">Country:</label>
-            <select
-              value={country}
-              onChange={handleCountryChange}
-              className="w-full appearance-none rounded-lg border border-gray-300 bg-white px-3 py-3 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-300"
-            >
-              <option value="" disabled>Select Country</option>
-              {COUNTRIES.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* City */}
-          <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">City:</label>
-            <select
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              disabled={!country}
-              className={`w-full appearance-none rounded-lg border ${country ? "border-gray-300" : "border-gray-200 bg-gray-100"} bg-white px-3 py-3 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-300`}
-            >
-              <option value="" disabled>{country ? "Select City" : "Choose country first"}</option>
-              {availableCities.map((ct) => (
-                <option key={ct} value={ct}>{ct}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* Job Type */}
-          <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">Job Type:</label>
-            <select
-              value={jobType}
-              onChange={(e) => setJobType(e.target.value)}
-              className="w-full appearance-none rounded-lg border border-gray-300 bg-white px-3 py-3 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-300"
-            >
-              <option value="" disabled>Select Job Type</option>
+            <label htmlFor="job-type" className={LABEL}>Job type</label>
+            <Select id="job-type" value={jobType} onChange={(e) => setJobType(e.target.value)}>
               {JOB_TYPES.map((jt) => (
                 <option key={jt.value} value={jt.value}>{jt.label}</option>
               ))}
-            </select>
+            </Select>
           </div>
-
-          {/* Resume */}
-          <div className="sm:col-span-2">
-            <ResumeSelector
-              onResumeSelect={(id) => { setResumeId(id); setResumeFile(null); }}
-              onFileSelect={(file) => { setResumeFile(file); setResumeId(undefined); }}
-              selectedResumeId={resumeId}
-              selectedFile={resumeFile}
-            />
+          <div>
+            <label htmlFor="country" className={LABEL}>Country</label>
+            <Select
+              id="country"
+              value={country}
+              onChange={(e) => {
+                setCountry(e.target.value);
+                setCity("");
+              }}
+            >
+              {COUNTRIES.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </Select>
+          </div>
+          <div>
+            <label htmlFor="city" className={LABEL}>City</label>
+            <Select id="city" value={city} onChange={(e) => setCity(e.target.value)} disabled={!country}>
+              <option value="" disabled>Select city</option>
+              {availableCities.map((ct) => (
+                <option key={ct} value={ct}>{ct}</option>
+              ))}
+            </Select>
           </div>
         </div>
+      </Step>
 
-        {/* Buttons */}
-        <div className="flex items-center justify-between border-t border-gray-200 pt-6">
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="inline-flex items-center rounded-lg bg-indigo-500 px-12 py-3 text-sm text-white shadow-md hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-300 disabled:opacity-50"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                Loading...
-              </>
-            ) : (
-              "Search"
-            )}
-          </button>
-          <button
-            type="button"
-            onClick={onBack}
-            className="inline-flex items-center rounded-lg bg-gray-300 px-12 py-3 text-sm text-gray-800 shadow-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300"
-          >
-            Back
-          </button>
+      <Step number={3} title="Sources">
+        <div className="flex flex-wrap gap-2">
+          {SITE_OPTIONS.map((opt) => {
+            const on = selectedSites.includes(opt.value);
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                aria-pressed={on}
+                onClick={() => toggleSite(opt.value)}
+                className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium ring-1 ring-inset transition ${
+                  on
+                    ? "bg-indigo-950 text-indigo-100 ring-indigo-500/70"
+                    : "bg-slate-950/60 text-slate-400 ring-slate-700 hover:text-slate-200"
+                }`}
+              >
+                {on && <Check size={14} aria-hidden />}
+                {opt.label}
+              </button>
+            );
+          })}
         </div>
+      </Step>
 
-        {error && <p className="mt-4 text-sm text-red-500">{error}</p>}
+      <div className="space-y-3 border-t border-slate-800 pt-6">
+        <Button type="submit" loading={isLoading} className="w-full py-3 text-base">
+          {!isLoading && <Search size={18} aria-hidden />}
+          Find matching jobs
+        </Button>
+        <p className="text-center text-xs text-slate-400">Usually takes 20–60 seconds</p>
+        {missing.length > 0 && (
+          <p role="alert" className="text-center text-sm text-rose-300">
+            Still needed: {missing.join(", ")}.
+          </p>
+        )}
+        {error && <p className="text-center text-sm text-rose-300">{error}</p>}
       </div>
     </form>
   );

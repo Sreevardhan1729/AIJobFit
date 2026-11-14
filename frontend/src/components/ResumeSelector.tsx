@@ -3,6 +3,7 @@ import { FileText, Upload, Trash2 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import * as api from "../api";
 import type { Resume } from "../types";
+import ResumeDropZone from "./ResumeDropZone";
 
 interface ResumeSelectorProps {
   onResumeSelect: (resumeId: string) => void;
@@ -10,6 +11,8 @@ interface ResumeSelectorProps {
   selectedResumeId?: string;
   selectedFile?: File | null;
 }
+
+const TAB = "inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition";
 
 export default function ResumeSelector({
   onResumeSelect,
@@ -27,6 +30,11 @@ export default function ResumeSelector({
       loadResumes();
     }
   }, [isAuthenticated]);
+
+  // A file chosen from outside (e.g. "Try the sample") should be visible, not hidden behind the saved list.
+  useEffect(() => {
+    if (selectedFile) setMode("upload");
+  }, [selectedFile]);
 
   const loadResumes = async () => {
     setLoading(true);
@@ -49,17 +57,7 @@ export default function ResumeSelector({
   };
 
   if (!isAuthenticated) {
-    return (
-      <div>
-        <label className="mb-2 block text-sm font-medium text-gray-700">Upload Resume (PDF):</label>
-        <input
-          type="file"
-          accept="application/pdf"
-          onChange={(e) => e.target.files?.[0] && onFileSelect(e.target.files[0])}
-          className="w-full cursor-pointer text-sm file:mr-2 file:rounded-lg file:border-0 file:bg-indigo-500 file:px-3 file:py-2 file:text-white hover:file:bg-indigo-600"
-        />
-      </div>
-    );
+    return <ResumeDropZone onFileSelect={onFileSelect} selectedFile={selectedFile} />;
   }
 
   return (
@@ -68,61 +66,48 @@ export default function ResumeSelector({
         <button
           type="button"
           onClick={() => setMode("saved")}
-          className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
-            mode === "saved"
-              ? "bg-indigo-500 text-white"
-              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-          }`}
+          className={`${TAB} ${mode === "saved" ? "bg-indigo-600 text-white" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}`}
         >
-          <FileText size={14} className="mr-1 inline" />
-          Saved Resume
+          <FileText size={14} aria-hidden />
+          Saved resume
         </button>
         <button
           type="button"
           onClick={() => setMode("upload")}
-          className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
-            mode === "upload"
-              ? "bg-indigo-500 text-white"
-              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-          }`}
+          className={`${TAB} ${mode === "upload" ? "bg-indigo-600 text-white" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}`}
         >
-          <Upload size={14} className="mr-1 inline" />
-          Upload New
+          <Upload size={14} aria-hidden />
+          Upload new
         </button>
       </div>
 
       {mode === "saved" && (
         <div className="space-y-2">
           {loading ? (
-            <p className="text-sm text-gray-500">Loading...</p>
+            <p className="text-sm text-slate-400">Loading...</p>
           ) : resumes.length === 0 ? (
-            <p className="text-sm text-gray-500">No saved resumes. Upload one below.</p>
+            <p className="text-sm text-slate-400">No saved resumes. Upload one instead.</p>
           ) : (
             resumes.map((resume) => (
               <div
                 key={resume.id}
-                className={`flex items-center justify-between rounded-lg border p-3 transition ${
+                className={`flex items-center justify-between rounded-xl border p-3 transition ${
                   selectedResumeId === resume.id
-                    ? "border-indigo-400 bg-indigo-50"
-                    : "border-gray-200 hover:border-gray-300"
+                    ? "border-indigo-400 bg-indigo-950/50"
+                    : "border-slate-700 hover:border-slate-500"
                 }`}
               >
-                <button
-                  type="button"
-                  onClick={() => onResumeSelect(resume.id)}
-                  className="flex-1 text-left"
-                >
-                  <p className="text-sm font-medium text-gray-800">{resume.filename}</p>
-                  <p className="text-xs text-gray-500">
-                    Uploaded {new Date(resume.uploaded_at).toLocaleDateString()}
-                  </p>
+                <button type="button" onClick={() => onResumeSelect(resume.id)} className="flex-1 text-left">
+                  <p className="text-sm font-medium text-slate-100">{resume.filename}</p>
+                  <p className="text-xs text-slate-400">Uploaded {new Date(resume.uploaded_at).toLocaleDateString()}</p>
                 </button>
                 <button
                   type="button"
+                  aria-label={`Delete ${resume.filename}`}
                   onClick={() => handleDelete(resume.id)}
-                  className="ml-2 text-gray-400 hover:text-red-500"
+                  className="ml-2 text-slate-400 hover:text-rose-300"
                 >
-                  <Trash2 size={16} />
+                  <Trash2 size={16} aria-hidden />
                 </button>
               </div>
             ))
@@ -130,19 +115,7 @@ export default function ResumeSelector({
         </div>
       )}
 
-      {mode === "upload" && (
-        <div>
-          <input
-            type="file"
-            accept="application/pdf"
-            onChange={(e) => e.target.files?.[0] && onFileSelect(e.target.files[0])}
-            className="w-full cursor-pointer text-sm file:mr-2 file:rounded-lg file:border-0 file:bg-indigo-500 file:px-3 file:py-2 file:text-white hover:file:bg-indigo-600"
-          />
-          {selectedFile && (
-            <p className="mt-1 text-xs text-gray-500">Selected: {selectedFile.name}</p>
-          )}
-        </div>
-      )}
+      {mode === "upload" && <ResumeDropZone onFileSelect={onFileSelect} selectedFile={selectedFile} />}
     </div>
   );
 }

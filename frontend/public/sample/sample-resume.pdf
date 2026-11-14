@@ -1,0 +1,73 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 873 >>
+stream
+BT
+/F1 10 Tf
+56 760 Td
+(Jane Doe) Tj
+0 -15 Td
+(Machine Learning Engineer · Bengaluru, India · jane.doe@example.com) Tj
+0 -15 Td
+() Tj
+0 -15 Td
+(SUMMARY) Tj
+0 -15 Td
+(ML engineer building computer-vision and recommendation features in production.) Tj
+0 -15 Td
+() Tj
+0 -15 Td
+(SKILLS) Tj
+0 -15 Td
+(Python, ML, sklearn, PyTorch, OpenCV, NumPy, Pandas, SQL, Docker, AWS, Git) Tj
+0 -15 Td
+() Tj
+0 -15 Td
+(EXPERIENCE) Tj
+0 -15 Td
+(Machine Learning Engineer, Acme Analytics) Tj
+0 -15 Td
+(Jan 2023 - Present) Tj
+0 -15 Td
+(Built image-classification and recommendation models with PyTorch and OpenCV; deployed them on AWS with Docker.) Tj
+0 -15 Td
+(Data Analyst Intern, Beta Labs) Tj
+0 -15 Td
+(Jun 2022 - Aug 2022) Tj
+0 -15 Td
+(Cleaned and analysed product data with Pandas and SQL.) Tj
+0 -15 Td
+() Tj
+0 -15 Td
+(EDUCATION) Tj
+0 -15 Td
+(M.S. in Computer Science, 2022) Tj
+0 -15 Td
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000001165 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1262
+%%EOF

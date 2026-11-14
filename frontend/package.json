@@ -24,7 +24,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "test:logic": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test tests/match.test.ts",
+    "test:logic": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test tests/match.test.ts tests/contrast.test.ts",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {

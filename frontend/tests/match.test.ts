@@ -1,6 +1,15 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { computeScore, aggregateGaps, jobMissesSkill } from "../src/lib/match.ts";
+import {
+  computeScore,
+  aggregateGaps,
+  jobMissesSkill,
+  matchLabel,
+  scoreBreakdown,
+  skillPreview,
+  searchStage,
+  missingFields,
+} from "../src/lib/match.ts";
 
 const s = (key: string, status: string, importance = "required") =>
   ({
@@ -40,4 +49,41 @@ test("aggregates gaps across jobs", () => {
 test("jobMissesSkill", () => {
   assert.equal(jobMissesSkill(jobs[1], "graphql"), true);
   assert.equal(jobMissesSkill(jobs[0], "python"), false);
+});
+
+test("matchLabel bands", () => {
+  assert.deepEqual([70, 69, 45, 44, 25, 24, 0].map((n) => matchLabel(n)?.label),
+    ["Strong match", "Good match", "Good match", "Fair match", "Fair match", "Low match", "Low match"]);
+  assert.deepEqual([80, 50, 30, 10].map((n) => matchLabel(n)?.tone), ["emerald", "teal", "amber", "rose"]);
+  assert.equal(matchLabel(null), null);
+});
+const mix = [s("py", "matched"), s("docker", "missing"), s("tf", "partial"),
+             s("gcp", "missing", "preferred"), s("dlib", "matched", "preferred")];
+test("scoreBreakdown adds up to computeScore", () => {
+  assert.deepEqual(scoreBreakdown(mix), { earned: 2, total: 4, score: 50,
+    required: { matched: 1, partial: 1, total: 3 }, preferred: { matched: 1, partial: 0, total: 2 } });
+  const marked = scoreBreakdown(mix, new Set(["docker", "tf"]));
+  assert.deepEqual([marked.earned, marked.score, marked.required.matched, marked.required.partial], [3.5, 88, 3, 0]);
+  assert.equal(marked.score, computeScore(mix, new Set(["docker", "tf"])));
+  assert.deepEqual(scoreBreakdown([]), { earned: 0, total: 0, score: null,
+    required: { matched: 0, partial: 0, total: 0 }, preferred: { matched: 0, partial: 0, total: 0 } });
+});
+test("skillPreview lists required first and skips partial", () => {
+  const skills = [s("dlib", "matched", "preferred"), s("py", "matched"), s("sql", "matched"), s("aws", "matched"),
+                  s("gcp", "missing", "preferred"), s("docker", "missing"), s("tf", "partial")];
+  assert.deepEqual(skillPreview(skills), { matches: ["py", "sql", "aws"], missing: ["docker", "gcp"] });
+  assert.deepEqual(skillPreview(skills, 1), { matches: ["py"], missing: ["docker"] });
+});
+test("searchStage by elapsed time", () => {
+  assert.deepEqual([0, 7.9, 8, 19, 20, 120].map(searchStage), [
+    "Searching LinkedIn / Indeed…", "Searching LinkedIn / Indeed…", "Reading job descriptions…",
+    "Reading job descriptions…", "Scoring against your resume…", "Scoring against your resume…"]);
+});
+
+test("missingFields lists what's still needed, in step order", () => {
+  const empty = { hasResume: false, searchTerm: "  ", country: "", city: "", jobType: "", sites: [] };
+  assert.deepEqual(missingFields(empty), [
+    "your resume", "a job title", "a country", "a city", "a job type", "at least one source"]);
+  assert.deepEqual(missingFields({ hasResume: true, searchTerm: "ML Engineer", country: "India", city: "Bangalore",
+    jobType: "fulltime", sites: ["indeed"] }), []);
 });

@@ -66,55 +66,56 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm"
           onClick={onClose}
         >
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            className="relative w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl"
+            className="relative w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-8 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               onClick={onClose}
-              className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+              aria-label="Close"
+              className="absolute right-4 top-4 text-slate-400 hover:text-slate-300"
             >
               <X size={20} />
             </button>
 
-            <h2 className="mb-6 text-2xl font-bold text-gray-800">
+            <h2 className="mb-6 text-2xl font-bold text-slate-100">
               {mode === "login" ? "Welcome Back" : "Create Account"}
             </h2>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">Email</label>
+                <label className="mb-1 block text-sm font-medium text-slate-300">Email</label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full rounded-lg border border-gray-300 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                  className="w-full rounded-lg border border-slate-700 bg-slate-950 text-slate-100 placeholder:text-slate-500 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
                   placeholder="you@example.com"
                 />
               </div>
 
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">Password</label>
+                <label className="mb-1 block text-sm font-medium text-slate-300">Password</label>
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full rounded-lg border border-gray-300 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                  className="w-full rounded-lg border border-slate-700 bg-slate-950 text-slate-100 placeholder:text-slate-500 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
                   placeholder="Min. 8 characters"
                 />
               </div>
 
               {mode === "signup" && (
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                  <label className="mb-1 block text-sm font-medium text-slate-300">
                     Confirm Password
                   </label>
                   <input
@@ -122,26 +123,26 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
-                    className="w-full rounded-lg border border-gray-300 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                    className="w-full rounded-lg border border-slate-700 bg-slate-950 text-slate-100 placeholder:text-slate-500 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
                     placeholder="Repeat password"
                   />
                 </div>
               )}
 
-              {error && <p className="text-sm text-red-500">{error}</p>}
+              {error && <p className="text-sm text-rose-300">{error}</p>}
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full rounded-lg bg-indigo-500 py-3 text-sm font-medium text-white shadow hover:bg-indigo-600 disabled:opacity-50"
+                className="w-full rounded-lg bg-indigo-600 py-3 text-sm font-medium text-white shadow hover:bg-indigo-700 disabled:opacity-50"
               >
                 {loading ? "Please wait..." : mode === "login" ? "Log In" : "Sign Up"}
               </button>
             </form>
 
-            <p className="mt-4 text-center text-sm text-gray-600">
+            <p className="mt-4 text-center text-sm text-slate-400">
               {mode === "login" ? "Don't have an account?" : "Already have an account?"}{" "}
-              <button onClick={switchMode} className="font-medium text-indigo-500 hover:underline">
+              <button onClick={switchMode} className="font-medium text-indigo-300 hover:underline">
                 {mode === "login" ? "Sign up" : "Log in"}
               </button>
             </p>
