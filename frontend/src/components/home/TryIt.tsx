@@ -82,17 +82,15 @@ export default function TryIt() {
       ? "The free server can take up to a minute to wake up."
       : status === "failed"
         ? "The live server is waking up — try again in a moment."
-        : usingSampleInputs
-          ? "Edit the job description or use your own resume to get a different result."
-          : "";
+        : "";
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
       <SectionHeading
         id="try-it"
         eyebrow="Try it"
-        title="Run a match on the sample, or on your own resume"
-        subtitle="Edit the job description, swap in your resume, and run it. Nothing here is saved to an account."
+        title="Try it on a sample resume"
+        subtitle="Edit the job, or switch to your own resume, then run it. Nothing here is saved."
       />
 
       <div className="grid items-start gap-4 lg:grid-cols-2">
@@ -149,6 +147,8 @@ export default function TryIt() {
           ) : (
             <ResumeDropZone
               onFileSelect={setOwnFile}
+              onClear={() => setOwnFile(null)}
+              note="Used for this match only, not saved."
               selectedFile={ownFile}
               hint="PDF only · used for this match, not saved"
             />
@@ -175,7 +175,7 @@ export default function TryIt() {
             id="try-job"
             value={jobText}
             onChange={(e) => setJobText(e.target.value)}
-            rows={10}
+            rows={6}
             placeholder="Paste a job description here"
             className={`${FIELD} leading-relaxed`}
           />
@@ -199,11 +199,11 @@ export default function TryIt() {
         <MatchReport key={runId} result={result} />
       </div>
 
-      <div className="mt-6 flex flex-wrap items-center gap-3 rounded-2xl border border-indigo-500/40 bg-indigo-950/40 p-5">
-        <p className="flex-1 text-sm text-slate-300">
-          Ready for real jobs? Upload your resume and get fresh LinkedIn and Indeed postings ranked by fit.
-        </p>
-        <Button to="/get_jobs">Find jobs that fit your resume →</Button>
+      <div className="mt-6 flex flex-wrap items-center gap-3 text-sm text-slate-400">
+        Ready for real jobs?
+        <Button to="/get_jobs" variant="secondary">
+          Find jobs that fit your resume →
+        </Button>
       </div>
     </section>
   );

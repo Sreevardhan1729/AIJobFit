@@ -69,7 +69,8 @@ test("your own resume is sent instead of the sample, without your login", async 
   fireEvent.click(screen.getByRole("button", { name: "Use my resume" }));
   const pdf = new File(["%PDF"], "my-cv.pdf", { type: "application/pdf" });
   fireEvent.drop(screen.getByText(/Drop your resume PDF here/), { dataTransfer: { files: [pdf] } });
-  expect(screen.getByText("Selected: my-cv.pdf")).toBeInTheDocument();
+  expect(screen.getByRole("status")).toHaveTextContent("Resume added: my-cv.pdf");
+  expect(screen.getByText("Used for this match only, not saved.")).toBeInTheDocument();
   fireEvent.click(runButton());
   expect(await screen.findByText("Your result")).toBeInTheDocument();
   expect(api.getMatch).toHaveBeenCalledWith(pdf, SAMPLE_JOB_TEXT, undefined, { anonymous: true });

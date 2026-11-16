@@ -80,6 +80,7 @@ export default function JobSearchForm({ onSubmit, isLoading, error }: JobSearchF
             setResumeId(undefined);
           }}
           selectedResumeId={resumeId}
+          onFileClear={() => setResumeFile(null)}
           selectedFile={resumeFile}
         />
       </Step>

@@ -2,15 +2,18 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Check, ChevronDown, Lightbulb, Plus } from "lucide-react";
 import type { FitStatus, MatchResult, SkillMatch, SkillStatus } from "../types";
-import { matchLabel, scoreBreakdown } from "../lib/match";
+import { biggestGaps, matchLabel, matchSummary, scoreBreakdown } from "../lib/match";
 import type { Tone } from "../lib/match";
 import Chip from "./ui/Chip";
 
+// Worst first: what to work on, then what's close, then what you already have.
 const GROUPS: { status: SkillStatus; title: string; chip: string }[] = [
-  { status: "matched", title: "Matched", chip: "bg-emerald-950 text-emerald-300 ring-emerald-800/60" },
-  { status: "partial", title: "Partial", chip: "bg-amber-950 text-amber-300 ring-amber-800/60" },
-  { status: "missing", title: "Missing", chip: "bg-rose-950 text-rose-300 ring-rose-800/60" },
+  { status: "missing", title: "Missing skills", chip: "bg-rose-950 text-rose-300 ring-rose-800/60" },
+  { status: "partial", title: "Close matches", chip: "bg-amber-950 text-amber-300 ring-amber-800/60" },
+  { status: "matched", title: "Matched skills", chip: "bg-emerald-950 text-emerald-300 ring-emerald-800/60" },
 ];
+
+const LIST_LIMIT = 8;
 
 const MARKED_CHIP = "bg-emerald-950 text-emerald-300 ring-emerald-500/70";
 
@@ -64,6 +67,55 @@ function SkillChip({ skill, chip, marked, onToggle }: {
   );
 }
 
+// A collapsed row in the details card; the summary card above already gives the answer.
+function Section({ title, count, children }: { title: string; count: number; children: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="border-t border-slate-800 first:border-t-0">
+      <button
+        type="button"
+        aria-expanded={open}
+        onClick={() => setOpen((isOpen) => !isOpen)}
+        className="flex w-full items-center justify-between gap-3 py-3.5 text-left text-sm font-semibold text-slate-100 hover:text-white"
+      >
+        <span>
+          {title} <span className="font-normal text-slate-400">({count})</span>
+        </span>
+        <ChevronDown size={16} aria-hidden className={`shrink-0 text-slate-400 transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && <div className="pb-4">{children}</div>}
+    </div>
+  );
+}
+
+function SkillList({ skills, chip, have, onToggle }: {
+  skills: SkillMatch[];
+  chip: string;
+  have: ReadonlySet<string>;
+  onToggle: (key: string) => void;
+}) {
+  const [showAll, setShowAll] = useState(false);
+  const shown = showAll ? skills : skills.slice(0, LIST_LIMIT);
+  return (
+    <>
+      <ul className="flex flex-wrap gap-2">
+        {shown.map((skill) => (
+          <SkillChip key={skill.key} skill={skill} chip={chip} marked={have.has(skill.key)} onToggle={onToggle} />
+        ))}
+      </ul>
+      {skills.length > LIST_LIMIT && (
+        <button
+          type="button"
+          onClick={() => setShowAll((all) => !all)}
+          className="mt-3 text-sm font-medium text-indigo-300 hover:text-indigo-200"
+        >
+          {showAll ? "Show fewer" : `Show all ${skills.length}`}
+        </button>
+      )}
+    </>
+  );
+}
+
 function FitRow({ label, asks, shows, status }: {
   label: string;
   asks: string | null;
@@ -100,7 +152,6 @@ export default function MatchReport({ result }: { result: MatchResult }) {
   const breakdown = scoreBreakdown(result.skills, have);
   const current = breakdown.score ?? 0;
   const label = matchLabel(current);
-  const canMark = result.skills.some((s) => s.status !== "matched");
   const toggle = (key: string) =>
     setHave((prev) => {
       const next = new Set(prev);
@@ -113,9 +164,10 @@ export default function MatchReport({ result }: { result: MatchResult }) {
     experience.required_years !== null || experience.resume_years !== null ||
     education.required_level !== null || education.resume_level !== null;
   const { required, preferred } = breakdown;
+  const gaps = biggestGaps(result.skills, have);
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-4">
       <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-6">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
           <motion.span
@@ -131,24 +183,18 @@ export default function MatchReport({ result }: { result: MatchResult }) {
           {have.size > 0 && (
             <span className="text-xs text-slate-400">was {result.score}% · with the skills you marked</span>
           )}
+          <button
+            type="button"
+            aria-expanded={showBreakdown}
+            onClick={() => setShowBreakdown((open) => !open)}
+            className="inline-flex items-center gap-1 text-sm font-medium text-indigo-300 hover:text-indigo-200 sm:ml-auto"
+          >
+            How this is scored
+            <ChevronDown size={14} aria-hidden className={`transition-transform ${showBreakdown ? "rotate-180" : ""}`} />
+          </button>
         </div>
-        <p className="mt-3 text-xs text-slate-400">Estimate from skill overlap, not an employer's ATS score.</p>
-        {canMark && (
-          <p className="mt-1 text-xs text-slate-400">
-            Click a missing skill only if you really have it, to see how your score would change.
-          </p>
-        )}
-        <button
-          type="button"
-          aria-expanded={showBreakdown}
-          onClick={() => setShowBreakdown((open) => !open)}
-          className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-indigo-300 hover:text-indigo-200"
-        >
-          How this is scored
-          <ChevronDown size={14} aria-hidden className={`transition-transform ${showBreakdown ? "rotate-180" : ""}`} />
-        </button>
         {showBreakdown && (
-          <div className="mt-3 space-y-1.5 rounded-xl border border-slate-800 bg-slate-950/60 p-4 text-sm text-slate-300">
+          <div className="mt-4 space-y-1.5 rounded-xl border border-slate-800 bg-slate-950/60 p-4 text-sm text-slate-300">
             <p>Required skills are worth 1 point, preferred ½. Matched earns full points, partial earns half.</p>
             <p className="font-medium text-slate-100">
               You have {formatPoints(breakdown.earned)} of {formatPoints(breakdown.total)} points → {current}%.
@@ -159,57 +205,65 @@ export default function MatchReport({ result }: { result: MatchResult }) {
             </p>
           </div>
         )}
+
+        <p className="mt-4 text-base text-slate-200">{matchSummary(breakdown)}</p>
+        {gaps.names.length > 0 && (
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
+            <span className="font-semibold text-slate-100">Biggest gaps</span>
+            {gaps.names.map((name) => (
+              <Chip key={name} tone="missing">{name}</Chip>
+            ))}
+            {gaps.more > 0 && <span className="text-slate-400">+{gaps.more} more</span>}
+          </div>
+        )}
+
+        {showFit && (
+          <div className="mt-4 border-t border-slate-800 pt-1">
+            <FitRow
+              label="Experience"
+              asks={experience.required_years !== null ? `${experience.required_years}+ yrs` : null}
+              shows={experience.resume_years !== null ? `~${experience.resume_years} yrs (estimate)` : null}
+              status={experience.status}
+            />
+            <FitRow
+              label="Education"
+              asks={education.required_level}
+              shows={education.resume_level}
+              status={education.status}
+            />
+          </div>
+        )}
+        <p className="mt-3 text-xs text-slate-400">Estimate from skill overlap, not an employer's ATS score.</p>
       </div>
 
-      <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-3">
+      <div className="rounded-2xl border border-slate-800 bg-slate-900/80 px-5">
         {GROUPS.map(({ status, title, chip }) => {
           const skills = result.skills.filter((s) => s.status === status);
           if (skills.length === 0) return null;
           return (
-            <div key={status} className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5">
-              <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-400">
-                {title} ({skills.length})
-              </h3>
-              <ul className="flex flex-wrap gap-2">
-                {skills.map((skill) => (
-                  <SkillChip key={skill.key} skill={skill} chip={chip} marked={have.has(skill.key)} onToggle={toggle} />
-                ))}
-              </ul>
-            </div>
+            <Section key={status} title={title} count={skills.length}>
+              {status !== "matched" && (
+                <p className="mb-3 text-xs text-slate-400">
+                  Click a skill only if you really have it, to see how your score would change.
+                </p>
+              )}
+              <SkillList skills={skills} chip={chip} have={have} onToggle={toggle} />
+            </Section>
           );
         })}
+        {result.tips.length > 0 && (
+          <Section title="Tips" count={result.tips.length}>
+            <ul className="space-y-2 text-sm text-slate-300">
+              {result.tips.map((tip) => (
+                <li key={tip.skill} className="flex gap-2">
+                  <Lightbulb size={16} aria-hidden className="mt-0.5 shrink-0 text-amber-300" />
+                  {tip.message}
+                </li>
+              ))}
+            </ul>
+          </Section>
+        )}
       </div>
-
-      {showFit && (
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/80 px-5 py-2">
-          <FitRow
-            label="Experience"
-            asks={experience.required_years !== null ? `${experience.required_years}+ yrs` : null}
-            shows={experience.resume_years !== null ? `~${experience.resume_years} yrs (estimate)` : null}
-            status={experience.status}
-          />
-          <FitRow
-            label="Education"
-            asks={education.required_level}
-            shows={education.resume_level}
-            status={education.status}
-          />
-        </div>
-      )}
-
-      {result.tips.length > 0 && (
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5">
-          <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-slate-400">
-            <Lightbulb size={16} aria-hidden className="text-amber-300" />
-            Tips
-          </h3>
-          <ul className="list-inside list-disc space-y-1 text-sm text-slate-300">
-            {result.tips.map((tip) => (
-              <li key={tip.skill}>{tip.message}</li>
-            ))}
-          </ul>
-        </div>
-      )}
     </div>
   );
 }

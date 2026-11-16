@@ -93,6 +93,10 @@ export default function ResumeJob() {
                 setUsingSample(false);
               }}
               selectedResumeId={resumeId}
+              onFileClear={() => {
+                setResumeFile(null);
+                setUsingSample(false);
+              }}
               selectedFile={resumeFile}
             />
           </div>

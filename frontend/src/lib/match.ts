@@ -91,6 +91,27 @@ export function skillPreview(skills: SkillMatch[], n = 3): { matches: string[]; 
   return { matches: names("matched"), missing: names("missing") };
 }
 
+// "You have 9 of 26 skills the job asks for, plus 3 close matches."
+export function matchSummary({ required, preferred }: ScoreBreakdown): string {
+  const matched = required.matched + preferred.matched;
+  const partial = required.partial + preferred.partial;
+  const total = required.total + preferred.total;
+  const close = partial === 0 ? "" : `, plus ${partial} close match${partial === 1 ? "" : "es"}`;
+  return `You have ${matched} of ${total} skills the job asks for${close}.`;
+}
+
+// The first n missing skills (required first) and how many more there are, ignoring skills marked as owned.
+export function biggestGaps(
+  skills: SkillMatch[],
+  have: ReadonlySet<string> = new Set(),
+  n = 3
+): { names: string[]; more: number } {
+  const unmarked = skills.filter((skill) => !have.has(skill.key));
+  const names = skillPreview(unmarked, n).missing;
+  const more = unmarked.filter((skill) => skill.status === "missing").length - names.length;
+  return { names, more };
+}
+
 // Hints driven by elapsed time: the backend does the whole search in one request.
 const SEARCH_STAGES: [number, string][] = [
   [20, "Scoring against your resume…"],

@@ -7,6 +7,8 @@ import {
   matchLabel,
   scoreBreakdown,
   skillPreview,
+  matchSummary,
+  biggestGaps,
   searchStage,
   missingFields,
 } from "../src/lib/match.ts";
@@ -73,6 +75,20 @@ test("skillPreview lists required first and skips partial", () => {
                   s("gcp", "missing", "preferred"), s("docker", "missing"), s("tf", "partial")];
   assert.deepEqual(skillPreview(skills), { matches: ["py", "sql", "aws"], missing: ["docker", "gcp"] });
   assert.deepEqual(skillPreview(skills, 1), { matches: ["py"], missing: ["docker"] });
+});
+test("matchSummary counts every skill and mentions close matches only when there are some", () => {
+  assert.equal(matchSummary(scoreBreakdown(mix)), "You have 2 of 5 skills the job asks for, plus 1 close match.");
+  assert.equal(matchSummary(scoreBreakdown(mix, new Set(["tf"]))), "You have 3 of 5 skills the job asks for.");
+  assert.equal(matchSummary(scoreBreakdown(quarter)), "You have 0 of 4 skills the job asks for, plus 1 close match.");
+  assert.equal(matchSummary(scoreBreakdown([s("a", "partial"), s("b", "partial")])),
+    "You have 0 of 2 skills the job asks for, plus 2 close matches.");
+});
+test("biggestGaps lists missing skills required first, leaves out marked ones and counts the rest", () => {
+  const skills = [s("gcp", "missing", "preferred"), s("docker", "missing"), s("k8s", "missing"),
+                  s("sql", "missing"), s("tf", "partial"), s("py", "matched")];
+  assert.deepEqual(biggestGaps(skills), { names: ["docker", "k8s", "sql"], more: 1 });
+  assert.deepEqual(biggestGaps(skills, new Set(["docker"])), { names: ["k8s", "sql", "gcp"], more: 0 });
+  assert.deepEqual(biggestGaps([s("py", "matched")]), { names: [], more: 0 });
 });
 test("searchStage by elapsed time", () => {
   assert.deepEqual([0, 7.9, 8, 19, 20, 120].map(searchStage), [

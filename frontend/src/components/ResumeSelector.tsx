@@ -8,6 +8,7 @@ import ResumeDropZone from "./ResumeDropZone";
 interface ResumeSelectorProps {
   onResumeSelect: (resumeId: string) => void;
   onFileSelect: (file: File) => void;
+  onFileClear?: () => void;
   selectedResumeId?: string;
   selectedFile?: File | null;
 }
@@ -17,6 +18,7 @@ const TAB = "inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-
 export default function ResumeSelector({
   onResumeSelect,
   onFileSelect,
+  onFileClear,
   selectedResumeId,
   selectedFile,
 }: ResumeSelectorProps) {
@@ -57,7 +59,14 @@ export default function ResumeSelector({
   };
 
   if (!isAuthenticated) {
-    return <ResumeDropZone onFileSelect={onFileSelect} selectedFile={selectedFile} />;
+    return (
+      <ResumeDropZone
+        onFileSelect={onFileSelect}
+        onClear={onFileClear}
+        selectedFile={selectedFile}
+        note="Used for this run only, not saved."
+      />
+    );
   }
 
   return (
@@ -115,7 +124,19 @@ export default function ResumeSelector({
         </div>
       )}
 
-      {mode === "upload" && <ResumeDropZone onFileSelect={onFileSelect} selectedFile={selectedFile} />}
+      {mode === "upload" && (
+        <ResumeDropZone
+          onFileSelect={onFileSelect}
+          onClear={onFileClear}
+          selectedFile={selectedFile}
+          // Logged-in uploads are saved when used, and accounts keep one resume.
+          note={
+            resumes.length > 0
+              ? "It will replace your saved resume when you run it."
+              : "It will be saved to your account when you run it."
+          }
+        />
+      )}
     </div>
   );
 }

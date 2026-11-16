@@ -1,11 +1,8 @@
 import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Hero from "../components/home/Hero";
-import ToolCards from "../components/home/ToolCards";
 import TryIt from "../components/home/TryIt";
 import HowItWorks from "../components/home/HowItWorks";
-import HonestyStrip from "../components/home/HonestyStrip";
-import BuiltWith from "../components/home/BuiltWith";
 import About from "../components/home/About";
 
 export default function Home() {
@@ -19,11 +16,8 @@ export default function Home() {
   return (
     <>
       <Hero />
-      <ToolCards />
       <TryIt />
       <HowItWorks />
-      <HonestyStrip />
-      <BuiltWith />
       <About />
     </>
   );
