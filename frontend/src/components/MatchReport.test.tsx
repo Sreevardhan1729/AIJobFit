@@ -144,3 +144,9 @@ test("the band reads as a mark", () => {
   render(<MatchReport result={result} />);
   expect(screen.getByText("Good match")).toHaveAttribute("data-mark", "have");
 });
+
+test("the marked-up post can be scrolled from the keyboard", () => {
+  render(<MatchReport result={result} jobText="Python, Docker" jobTextOpen />);
+  const region = screen.getByRole("region", { name: "The job post, marked up" });
+  expect(region.querySelector('[tabindex="0"]')).toHaveTextContent("Python, Docker");
+});

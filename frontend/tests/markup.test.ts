@@ -77,3 +77,15 @@ test("ambiguous words are marked only as written and capitalised, never single l
   assert.deepEqual(marked("You excel at SQL", [s("Microsoft Excel", "missing", "excel")]), []);
   assert.deepEqual(marked("Series C funding, R&D and the C-suite", [s("C"), s("R")]), []);
 });
+
+test("separator variants match like the backend scanner", () => {
+  const sk = s("Scikit-learn", "matched", "Scikit-Learn");
+  const ml = s("Machine Learning", "matched", "ML");
+  assert.deepEqual(marked("Scikit Learn, scikitlearn and machine-learning or machine_learning", [sk, ml]), [
+    "Scikit Learn=Scikit-learn",
+    "scikitlearn=Scikit-learn",
+    "machine-learning=Machine Learning",
+    "machine_learning=Machine Learning",
+  ]);
+  assert.deepEqual(marked(".NET and Node js", [s(".NET"), s("Node.js")]), [".NET=.NET", "Node js=Node.js"]);
+});

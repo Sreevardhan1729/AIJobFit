@@ -6,9 +6,9 @@ import type { Tone } from "../../lib/match";
 export type MarkKind = "have" | "close" | "miss" | "plain";
 
 const KINDS: Record<MarkKind, string> = {
-  have: "rounded-sm bg-have px-0.5 [box-decoration-break:clone]",
+  have: "rounded-sm bg-have px-0.5 text-ink [box-decoration-break:clone]",
   // The dotted underline keeps close apart from have without relying on hue (red-green colour blindness).
-  close: "rounded-sm bg-close px-0.5 underline decoration-ink-2 decoration-dotted decoration-[1.5px] underline-offset-[3px] [box-decoration-break:clone]",
+  close: "rounded-sm bg-close px-0.5 text-ink underline decoration-ink-2 decoration-dotted decoration-[1.5px] underline-offset-[3px] [box-decoration-break:clone]",
   miss: "underline decoration-miss decoration-wavy decoration-[1.5px] underline-offset-[3px]",
   plain: "text-ink-2",
 };

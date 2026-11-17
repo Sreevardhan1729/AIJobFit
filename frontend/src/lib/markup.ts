@@ -14,23 +14,40 @@ const AMBIGUOUS = new Set([
 ]);
 
 type Hit = { start: number; end: number; skill: SkillMatch };
+type Term = { pattern: string; length: number; skill: SkillMatch };
 
 const escapeRegExp = (term: string) => term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+// Like the backend's _alias_pattern: a space, dot, slash, underscore or hyphen between two letters or digits
+// may be any run of those or nothing, so "Scikit-learn" also matches "Scikit Learn" and "scikitlearn".
+const splitTerm = (term: string) => term.split(/([\s._/-]+)/);
+const joinsWords = (parts: string[], i: number) =>
+  i % 2 === 1 && /[A-Za-z0-9]$/.test(parts[i - 1]) && /^[A-Za-z0-9]/.test(parts[i + 1] ?? "");
+const termPattern = (term: string) =>
+  splitTerm(term)
+    .map((part, i, parts) => (joinsWords(parts, i) ? "[ \\t._/-]*" : escapeRegExp(part)))
+    .join("");
+// The lookup key with those word-joining separators removed, so every variant finds the same skill.
+const termKey = (text: string) =>
+  splitTerm(text)
+    .filter((_, i, parts) => !joinsWords(parts, i))
+    .join("");
 const isWordChar = (ch: string | undefined) => ch !== undefined && /[A-Za-z0-9]/.test(ch);
 
 // Every match of the terms that respects the backend scanner's word boundaries (app/matching/skills.py): no
 // letter or digit before, no letter, digit, + or # after. The "before" check is done by hand because Safari
 // before 16.4 can't parse regex lookbehind.
-function findHits(text: string, terms: Map<string, SkillMatch>, caseSensitive: boolean): Hit[] {
+function findHits(text: string, terms: Map<string, Term>, caseSensitive: boolean): Hit[] {
   if (terms.size === 0) return [];
   // Longest first, so "Deep Learning" wins over "Learning" at the same position.
-  const alternatives = [...terms.keys()].sort((a, b) => b.length - a.length).map(escapeRegExp);
+  const alternatives = [...terms.values()].sort((a, b) => b.length - a.length).map((term) => term.pattern);
   const pattern = new RegExp(`(?:${alternatives.join("|")})(?![A-Za-z0-9+#])`, caseSensitive ? "g" : "gi");
   const hits: Hit[] = [];
   let match: RegExpExecArray | null;
   while ((match = pattern.exec(text)) !== null) {
     const start = match.index;
-    const skill = terms.get(caseSensitive ? match[0] : match[0].toLowerCase());
+    const key = termKey(match[0]);
+    const skill = terms.get(caseSensitive ? key : key.toLowerCase())?.skill;
     if (isWordChar(text[start - 1]) || !skill) {
       pattern.lastIndex = start + 1;
       continue;
@@ -44,16 +61,18 @@ function findHits(text: string, terms: Map<string, SkillMatch>, caseSensitive: b
 // skill, so each skill is searched by its job wording, its name and the resume's wording.
 export function markSkills(text: string, skills: SkillMatch[]): Segment[] {
   if (!text) return [];
-  const loose = new Map<string, SkillMatch>(); // lowercased term → skill, matched in any case
-  const exact = new Map<string, SkillMatch>(); // ambiguous terms, matched only as written
+  const loose = new Map<string, Term>(); // lowercased key → term, matched in any case
+  const exact = new Map<string, Term>(); // ambiguous terms, matched only as written
   for (const skill of skills) {
     for (const raw of [skill.job_term, skill.name, skill.resume_term]) {
       const term = raw?.trim();
       if (!term || term.length < 2) continue; // single letters (C, R) are never marked
+      const entry = { pattern: termPattern(term), length: term.length, skill };
+      const key = termKey(term);
       if (!AMBIGUOUS.has(term.toLowerCase())) {
-        if (!loose.has(term.toLowerCase())) loose.set(term.toLowerCase(), skill);
-      } else if (/[A-Z]/.test(term) && !exact.has(term)) {
-        exact.set(term, skill);
+        if (!loose.has(key.toLowerCase())) loose.set(key.toLowerCase(), entry);
+      } else if (/[A-Z]/.test(term) && !exact.has(key)) {
+        exact.set(key, entry);
       }
     }
   }

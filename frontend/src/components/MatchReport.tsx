@@ -238,7 +238,11 @@ export default function MatchReport({ result, jobText, jobTextOpen = false }: {
       <div className="border border-rule bg-sheet px-5">
         {jobText?.trim() && (
           <Section title="The job post, marked up" defaultOpen={jobTextOpen}>
-            <div className="max-h-96 overflow-y-auto pr-2 text-sm leading-7 text-ink">
+            {/* Focusable so keyboard users can scroll it; break-words keeps long scraped URLs inside. */}
+            <div
+              tabIndex={0}
+              className="max-h-96 overflow-y-auto break-words pr-2 text-sm leading-7 text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+            >
               <MarkedText text={jobText} skills={result.skills} have={have} />
             </div>
             <MarkLegend className="mt-3 border-t border-rule-soft pt-3" />

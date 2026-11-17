@@ -30,3 +30,14 @@ test("close matches carry a cue besides colour, so they differ from have marks w
   render(<Mark kind="close">TensorFlow</Mark>);
   expect(screen.getByText("TensorFlow").className).toMatch(/decoration-dotted/);
 });
+
+test("highlighter marks set their own ink, so grey parent text can't fade them in dark mode", () => {
+  render(
+    <p className="text-ink-2">
+      <Mark kind="have">Python</Mark>
+      <Mark kind="close">TensorFlow</Mark>
+    </p>
+  );
+  expect(screen.getByText("Python").className).toMatch(/(^|\s)text-ink(\s|$)/);
+  expect(screen.getByText("TensorFlow").className).toMatch(/(^|\s)text-ink(\s|$)/);
+});
