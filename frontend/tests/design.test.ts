@@ -86,3 +86,9 @@ test("no regex lookbehind in app code", () => {
   const found = sourceFiles(SRC).filter((file) => readFileSync(file, "utf8").includes("(?<"));
   assert.deepEqual(found.map((file) => file.slice(SRC.length + 1)), []);
 });
+
+// Ink flips to near-white in dark mode, so a translucent ink layer would wash the page out instead of dimming it.
+test("overlays dim with the scrim token, not translucent ink", () => {
+  const found = sourceFiles(SRC).filter((file) => /\bbg-ink\/\d/.test(readFileSync(file, "utf8")));
+  assert.deepEqual(found.map((file) => file.slice(SRC.length + 1)), []);
+});

@@ -13,6 +13,7 @@ module.exports = {
     miss: "#C8412B",
     missText: "#A8321F",
     missSoft: "#F6D3CB",
+    scrim: "#1C1C1F", // dims the page behind a modal
   },
   // Warm charcoal with off-white ink; the highlighter marks become muted tints so long posts stay calm.
   dark: {
@@ -27,5 +28,6 @@ module.exports = {
     miss: "#E5694F",
     missText: "#F08C76",
     missSoft: "#4A2A23",
+    scrim: "#000000",
   },
 };

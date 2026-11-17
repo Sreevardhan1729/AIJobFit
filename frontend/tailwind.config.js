@@ -5,7 +5,7 @@ const palettes = require("./theme.palettes");
 // Palette key → CSS variable name. Colors are CSS variables so every token class follows the theme.
 const VARS = {
   paper: "paper", sheet: "sheet", ink: "ink", ink2: "ink-2", rule: "rule", ruleSoft: "rule-soft",
-  have: "have", close: "close", miss: "miss", missText: "miss-text", missSoft: "miss-soft",
+  have: "have", close: "close", miss: "miss", missText: "miss-text", missSoft: "miss-soft", scrim: "scrim",
 };
 // "#F5F5F2" → "245 245 242", so opacity modifiers like bg-paper/95 still work.
 const channels = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(" ");
@@ -28,6 +28,7 @@ module.exports = {
         have: color("have"),
         close: color("close"),
         miss: { DEFAULT: color("miss"), text: color("miss-text"), soft: color("miss-soft") },
+        scrim: color("scrim"),
       },
       fontFamily: {
         sans: ["Public Sans", ...defaultTheme.fontFamily.sans],
