@@ -22,11 +22,11 @@ const DEFAULT_COUNTRY = "India";
 function Step({ number, title, children }: { number: number; title: string; children: React.ReactNode }) {
   return (
     <section className="flex gap-4">
-      <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-sm font-bold text-white">
+      <span aria-hidden className="w-6 shrink-0 font-serif text-2xl font-medium leading-none text-ink">
         {number}
       </span>
       <div className="min-w-0 flex-1">
-        <h2 className="mb-3 text-base font-semibold text-slate-100">{title}</h2>
+        <h2 className="mb-3 text-base font-semibold text-ink">{title}</h2>
         {children}
       </div>
     </section>
@@ -67,7 +67,7 @@ export default function JobSearchForm({ onSubmit, isLoading, error }: JobSearchF
     <form
       onSubmit={handleSubmit}
       noValidate
-      className="mx-auto max-w-4xl space-y-8 rounded-2xl border border-slate-800 bg-slate-900/80 p-6 sm:p-8"
+      className="mx-auto max-w-4xl space-y-8 border border-rule bg-sheet p-6 sm:p-8"
     >
       <Step number={1} title="Your resume">
         <ResumeSelector
@@ -143,10 +143,8 @@ export default function JobSearchForm({ onSubmit, isLoading, error }: JobSearchF
                 type="button"
                 aria-pressed={on}
                 onClick={() => toggleSite(opt.value)}
-                className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium ring-1 ring-inset transition ${
-                  on
-                    ? "bg-indigo-950 text-indigo-100 ring-indigo-500/70"
-                    : "bg-slate-950/60 text-slate-400 ring-slate-700 hover:text-slate-200"
+                className={`inline-flex items-center gap-1.5 rounded-[3px] border px-4 py-1.5 text-sm font-medium transition-colors ${
+                  on ? "border-ink bg-ink text-white" : "border-rule bg-sheet text-ink-2 hover:border-ink hover:text-ink"
                 }`}
               >
                 {on && <Check size={14} aria-hidden />}
@@ -157,18 +155,18 @@ export default function JobSearchForm({ onSubmit, isLoading, error }: JobSearchF
         </div>
       </Step>
 
-      <div className="space-y-3 border-t border-slate-800 pt-6">
+      <div className="space-y-3 border-t border-rule pt-6">
         <Button type="submit" loading={isLoading} className="w-full py-3 text-base">
           {!isLoading && <Search size={18} aria-hidden />}
           Find matching jobs
         </Button>
-        <p className="text-center text-xs text-slate-400">Usually takes 20–60 seconds</p>
+        <p className="text-center text-xs text-ink-2">Usually takes 20–60 seconds</p>
         {missing.length > 0 && (
-          <p role="alert" className="text-center text-sm text-rose-300">
+          <p role="alert" className="text-center text-sm text-miss-text">
             Still needed: {missing.join(", ")}.
           </p>
         )}
-        {error && <p className="text-center text-sm text-rose-300">{error}</p>}
+        {error && <p className="text-center text-sm text-miss-text">{error}</p>}
       </div>
     </form>
   );

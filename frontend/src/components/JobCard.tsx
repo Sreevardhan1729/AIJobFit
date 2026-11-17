@@ -1,16 +1,29 @@
 import React from "react";
-import { motion } from "framer-motion";
 import { ExternalLink } from "lucide-react";
 import type { JobResult } from "../types";
 import { matchLabel, skillPreview } from "../lib/match";
-import Chip from "./ui/Chip";
+import Mark, { bandMark } from "./ui/Mark";
+import type { MarkKind } from "./ui/Mark";
 
 interface JobCardProps {
   job: JobResult;
-  index: number;
 }
 
-export default function JobCard({ job, index }: JobCardProps) {
+function MarkedList({ label, names, kind }: { label: string; names: string[]; kind: MarkKind }) {
+  return (
+    <p>
+      {label}:{" "}
+      {names.map((name, i) => (
+        <React.Fragment key={name}>
+          {i > 0 && ", "}
+          <Mark kind={kind} className="text-ink">{name}</Mark>
+        </React.Fragment>
+      ))}
+    </p>
+  );
+}
+
+export default function JobCard({ job }: JobCardProps) {
   const handleDetails = () => {
     localStorage.setItem(`handoff:${job.id}`, JSON.stringify(job));
     window.open(`/get_jobs/${job.id}`, "_blank", "noopener,noreferrer");
@@ -25,32 +38,27 @@ export default function JobCard({ job, index }: JobCardProps) {
   const meta = [job.site, job.job_type, posted && `Posted ${posted}`].filter(Boolean).join(" · ");
 
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.4, delay: index * 0.05 }}
-      className="w-full max-w-3xl rounded-2xl border border-slate-800 bg-slate-900/80 p-5 sm:p-6"
-    >
+    <article className="w-full max-w-3xl border border-rule bg-sheet p-5 sm:p-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0 space-y-1">
-          <h2 className="line-clamp-2 text-lg font-semibold leading-snug text-slate-100">{job.title}</h2>
-          <p className="text-sm text-slate-400">{[job.company, job.location].filter(Boolean).join(" · ")}</p>
-          {meta && <p className="text-xs text-slate-400">{meta}</p>}
+          <h2 className="line-clamp-2 font-serif text-xl font-medium leading-snug text-ink">{job.title}</h2>
+          <p className="text-sm text-ink-2">{[job.company, job.location].filter(Boolean).join(" · ")}</p>
+          {meta && <p className="text-xs text-ink-2">{meta}</p>}
         </div>
         {label && score !== null && (
-          <div className="flex shrink-0 items-center gap-2">
-            <span className="text-2xl font-bold text-slate-100">{score}%</span>
-            <Chip tone={label.tone}>{label.label}</Chip>
+          <div className="flex shrink-0 items-baseline gap-2 sm:flex-col sm:items-end sm:gap-1.5">
+            <span className="font-serif text-3xl font-medium leading-none text-ink">{score}%</span>
+            <Mark kind={bandMark(label.tone)} className="text-xs font-semibold">
+              {label.label}
+            </Mark>
           </div>
         )}
       </div>
 
       {(preview.matches.length > 0 || preview.missing.length > 0) && (
-        <div className="mt-4 space-y-1 text-sm">
-          {preview.matches.length > 0 && <p className="text-emerald-300">Matches: {preview.matches.join(", ")}</p>}
-          {preview.missing.length > 0 && <p className="text-rose-300">Missing: {preview.missing.join(", ")}</p>}
+        <div className="mt-4 space-y-1 border-t border-rule-soft pt-3 text-sm text-ink-2">
+          {preview.matches.length > 0 && <MarkedList label="Matches" names={preview.matches} kind="have" />}
+          {preview.missing.length > 0 && <MarkedList label="Missing" names={preview.missing} kind="miss" />}
         </div>
       )}
 
@@ -58,7 +66,7 @@ export default function JobCard({ job, index }: JobCardProps) {
         <button
           type="button"
           onClick={handleDetails}
-          className="rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-medium text-slate-100 hover:border-slate-500 hover:bg-slate-800"
+          className="rounded-[3px] border border-ink px-4 py-2 text-sm font-medium text-ink hover:bg-paper"
         >
           More details
         </button>
@@ -66,11 +74,11 @@ export default function JobCard({ job, index }: JobCardProps) {
           href={job.job_url}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700"
+          className="inline-flex items-center gap-1.5 rounded-[3px] bg-ink px-4 py-2 text-sm font-semibold text-white hover:bg-black"
         >
           Apply <ExternalLink size={14} aria-hidden />
         </a>
       </div>
-    </motion.div>
+    </article>
   );
 }

@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import JobCard from "./JobCard";
 import type { Importance, SkillStatus } from "../types";
 
@@ -29,8 +29,13 @@ test("card shows band, score and skill preview", () => {
   render(<JobCard job={job} index={0} />);
   expect(screen.getByText("Good match")).toBeInTheDocument();
   expect(screen.getByText("50%")).toBeInTheDocument();
-  expect(screen.getByText("Matches: Python, SQL, AWS")).toBeInTheDocument();
-  expect(screen.getByText("Missing: Docker, GCP")).toBeInTheDocument();
+  const matches = screen.getByText(/^Matches:/);
+  expect(matches).toHaveTextContent("Matches: Python, SQL, AWS");
+  expect(within(matches).getByText("Python")).toHaveAttribute("data-mark", "have");
+  const missing = screen.getByText(/^Missing:/);
+  expect(missing).toHaveTextContent("Missing: Docker, GCP");
+  expect(within(missing).getByText("Docker")).toHaveAttribute("data-mark", "miss");
+  expect(screen.getByText("Good match")).toHaveAttribute("data-mark", "have");
 });
 
 test("JobCard renders without match data", () => {

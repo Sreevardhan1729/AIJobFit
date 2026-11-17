@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FileText, Upload, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import * as api from "../api";
 import type { Resume } from "../types";
@@ -13,7 +13,9 @@ interface ResumeSelectorProps {
   selectedFile?: File | null;
 }
 
-const TAB = "inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition";
+const TAB = "border-b-2 pb-1 text-sm transition-colors";
+const TAB_ON = "border-ink font-semibold text-ink";
+const TAB_OFF = "border-transparent text-ink-2 hover:text-ink";
 
 export default function ResumeSelector({
   onResumeSelect,
@@ -71,21 +73,19 @@ export default function ResumeSelector({
 
   return (
     <div className="space-y-3">
-      <div className="flex gap-2">
+      <div className="flex gap-5">
         <button
           type="button"
           onClick={() => setMode("saved")}
-          className={`${TAB} ${mode === "saved" ? "bg-indigo-600 text-white" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}`}
+          className={`${TAB} ${mode === "saved" ? TAB_ON : TAB_OFF}`}
         >
-          <FileText size={14} aria-hidden />
           Saved resume
         </button>
         <button
           type="button"
           onClick={() => setMode("upload")}
-          className={`${TAB} ${mode === "upload" ? "bg-indigo-600 text-white" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}`}
+          className={`${TAB} ${mode === "upload" ? TAB_ON : TAB_OFF}`}
         >
-          <Upload size={14} aria-hidden />
           Upload new
         </button>
       </div>
@@ -93,28 +93,26 @@ export default function ResumeSelector({
       {mode === "saved" && (
         <div className="space-y-2">
           {loading ? (
-            <p className="text-sm text-slate-400">Loading...</p>
+            <p className="text-sm text-ink-2">Loading...</p>
           ) : resumes.length === 0 ? (
-            <p className="text-sm text-slate-400">No saved resumes. Upload one instead.</p>
+            <p className="text-sm text-ink-2">No saved resumes. Upload one instead.</p>
           ) : (
             resumes.map((resume) => (
               <div
                 key={resume.id}
-                className={`flex items-center justify-between rounded-xl border p-3 transition ${
-                  selectedResumeId === resume.id
-                    ? "border-indigo-400 bg-indigo-950/50"
-                    : "border-slate-700 hover:border-slate-500"
+                className={`flex items-center justify-between border p-3 transition-colors ${
+                  selectedResumeId === resume.id ? "border-ink bg-paper" : "border-rule hover:border-ink"
                 }`}
               >
                 <button type="button" onClick={() => onResumeSelect(resume.id)} className="flex-1 text-left">
-                  <p className="text-sm font-medium text-slate-100">{resume.filename}</p>
-                  <p className="text-xs text-slate-400">Uploaded {new Date(resume.uploaded_at).toLocaleDateString()}</p>
+                  <p className="text-sm font-medium text-ink">{resume.filename}</p>
+                  <p className="text-xs text-ink-2">Uploaded {new Date(resume.uploaded_at).toLocaleDateString()}</p>
                 </button>
                 <button
                   type="button"
                   aria-label={`Delete ${resume.filename}`}
                   onClick={() => handleDelete(resume.id)}
-                  className="ml-2 text-slate-400 hover:text-rose-300"
+                  className="ml-2 text-ink-2 hover:text-miss-text"
                 >
                   <Trash2 size={16} aria-hidden />
                 </button>

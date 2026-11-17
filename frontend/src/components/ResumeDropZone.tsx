@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { CheckCircle2, FileText, UploadCloud } from "lucide-react";
+import { CheckCircle2, UploadCloud } from "lucide-react";
 
 interface ResumeDropZoneProps {
   onFileSelect: (file: File) => void;
@@ -56,21 +56,18 @@ export default function ResumeDropZone({
         // Inline confirmation right where the file was added (not a toast), announced without moving focus.
         <div
           {...dropHandlers}
-          className={`rounded-2xl border px-4 py-3.5 transition ${
-            dragging ? "border-indigo-400 bg-indigo-950/40" : "border-emerald-700/70 bg-emerald-950/30"
-          }`}
+          className={`border px-4 py-3.5 transition-colors ${dragging ? "border-ink bg-paper" : "border-rule bg-sheet"}`}
         >
           <div className="flex items-center gap-3">
-            <CheckCircle2 size={22} aria-hidden className="shrink-0 text-emerald-300" />
+            <CheckCircle2 size={22} aria-hidden className="shrink-0 text-ink" />
             <div className="min-w-0 flex-1">
-              <p role="status" className="text-sm font-semibold text-emerald-200">
+              <p role="status" className="text-sm font-semibold text-ink">
                 Resume added<span className="sr-only">: {selectedFile.name}</span>
               </p>
-              <p className="flex min-w-0 items-center gap-1.5 text-sm text-slate-300">
-                <FileText size={14} aria-hidden className="shrink-0 text-slate-400" />
+              <p className="flex min-w-0 items-center gap-1.5 text-sm text-ink">
                 <span className="truncate" title={selectedFile.name}>{selectedFile.name}</span>
-                <span className="shrink-0 text-slate-400">·</span>
-                <span className="shrink-0 text-slate-400">{formatSize(selectedFile.size)}</span>
+                <span className="shrink-0 text-ink-2">·</span>
+                <span className="shrink-0 text-ink-2">{formatSize(selectedFile.size)}</span>
               </p>
             </div>
             <div className="flex shrink-0 items-center gap-3 text-sm font-medium">
@@ -78,7 +75,7 @@ export default function ResumeDropZone({
                 type="button"
                 aria-label={`Replace ${selectedFile.name}`}
                 onClick={openChooser}
-                className="text-indigo-300 hover:text-indigo-200"
+                className="text-ink underline decoration-rule underline-offset-4 hover:decoration-ink"
               >
                 Replace
               </button>
@@ -90,30 +87,30 @@ export default function ResumeDropZone({
                     setError("");
                     onClear();
                   }}
-                  className="text-slate-300 hover:text-white"
+                  className="text-ink-2 underline decoration-rule underline-offset-4 hover:text-ink hover:decoration-ink"
                 >
                   Remove
                 </button>
               )}
             </div>
           </div>
-          {note && <p className="mt-2 pl-[34px] text-xs text-slate-400">{note}</p>}
+          {note && <p className="mt-2 pl-[34px] text-xs text-ink-2">{note}</p>}
         </div>
       ) : (
         <div
           {...dropHandlers}
-          className={`flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed px-6 py-8 text-center transition ${
-            dragging ? "border-indigo-400 bg-indigo-950/40" : "border-slate-700 bg-slate-950/40 hover:border-slate-500"
+          className={`flex flex-col items-center justify-center gap-2 border border-dashed px-6 py-8 text-center transition-colors ${
+            dragging ? "border-ink bg-paper" : "border-ink-2/60 bg-sheet hover:border-ink"
           }`}
         >
-          <UploadCloud size={28} aria-hidden className="text-indigo-300" />
-          <p className="text-sm text-slate-300">
+          <UploadCloud size={26} aria-hidden className="text-ink-2" />
+          <p className="text-sm text-ink">
             Drop your resume PDF here or{" "}
-            <button type="button" onClick={openChooser} className="font-semibold text-indigo-300 hover:text-indigo-200">
+            <button type="button" onClick={openChooser} className="font-semibold text-ink underline underline-offset-4">
               choose a file
             </button>
           </p>
-          <p className="text-xs text-slate-400">{hint}</p>
+          <p className="text-xs text-ink-2">{hint}</p>
         </div>
       )}
       <input
@@ -127,7 +124,7 @@ export default function ResumeDropZone({
         }}
       />
       {error && (
-        <p role="alert" className="mt-2 text-sm text-rose-300">
+        <p role="alert" className="mt-2 text-sm text-miss-text">
           {error}
         </p>
       )}

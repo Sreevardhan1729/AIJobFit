@@ -12,16 +12,16 @@ export default function SearchProgress() {
   }, []);
 
   return (
-    <div className="mx-auto mt-6 flex max-w-3xl items-center gap-4 rounded-2xl border border-slate-800 bg-slate-900/80 p-5">
-      <Spinner className="h-6 w-6 text-indigo-300" />
+    <div className="mx-auto mt-6 flex max-w-3xl items-center gap-4 border border-rule bg-sheet p-5">
+      <Spinner className="h-6 w-6 text-ink" />
       <div className="flex-1">
         {/* Only the stage is announced; the per-second counter would be read out every second. */}
-        <p aria-live="polite" className="font-medium text-slate-100">
+        <p aria-live="polite" className="font-medium text-ink">
           {searchStage(elapsed)}
         </p>
-        <p className="text-xs text-slate-400">Usually 20–60 seconds</p>
+        <p className="text-xs text-ink-2">Usually 20–60 seconds</p>
       </div>
-      <span aria-hidden="true" className="font-mono text-sm text-slate-400">
+      <span aria-hidden="true" className="text-sm tabular-nums text-ink-2">
         {elapsed}s
       </span>
     </div>
