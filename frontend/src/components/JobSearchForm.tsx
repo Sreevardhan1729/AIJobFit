@@ -144,7 +144,7 @@ export default function JobSearchForm({ onSubmit, isLoading, error }: JobSearchF
                 aria-pressed={on}
                 onClick={() => toggleSite(opt.value)}
                 className={`inline-flex items-center gap-1.5 rounded-[3px] border px-4 py-1.5 text-sm font-medium transition-colors ${
-                  on ? "border-ink bg-ink text-white" : "border-rule bg-sheet text-ink-2 hover:border-ink hover:text-ink"
+                  on ? "border-ink bg-ink text-paper" : "border-rule bg-sheet text-ink-2 hover:border-ink hover:text-ink"
                 }`}
               >
                 {on && <Check size={14} aria-hidden />}

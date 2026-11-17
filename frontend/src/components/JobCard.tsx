@@ -74,7 +74,7 @@ export default function JobCard({ job }: JobCardProps) {
           href={job.job_url}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 rounded-[3px] bg-ink px-4 py-2 text-sm font-semibold text-white hover:bg-black"
+          className="inline-flex items-center gap-1.5 rounded-[3px] bg-ink px-4 py-2 text-sm font-semibold text-paper hover:bg-ink-2"
         >
           Apply <ExternalLink size={14} aria-hidden />
         </a>

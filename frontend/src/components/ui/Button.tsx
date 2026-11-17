@@ -10,7 +10,7 @@ const BASE =
   "disabled:cursor-not-allowed disabled:opacity-60";
 
 const VARIANTS: Record<Variant, string> = {
-  primary: "bg-ink text-white hover:bg-black",
+  primary: "bg-ink text-paper hover:bg-ink-2",
   secondary: "border border-ink text-ink hover:bg-sheet",
   ghost: "px-0 text-ink underline decoration-rule underline-offset-4 hover:decoration-ink",
 };

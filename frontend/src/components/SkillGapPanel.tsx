@@ -27,7 +27,7 @@ export default function SkillGapPanel({ jobs, selected, onSelect }: SkillGapPane
                 aria-pressed={isSelected}
                 onClick={() => onSelect(isSelected ? null : gap.key)}
                 className={`rounded-[3px] border px-2.5 py-1 text-sm transition-colors ${
-                  isSelected ? "border-ink bg-ink text-white" : "border-rule bg-sheet text-ink hover:border-ink"
+                  isSelected ? "border-ink bg-ink text-paper" : "border-rule bg-sheet text-ink hover:border-ink"
                 }`}
               >
                 {isSelected ? gap.name : <Mark kind="miss">{gap.name}</Mark>}

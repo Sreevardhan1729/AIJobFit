@@ -51,19 +51,34 @@ function contrast(a: string, b: string): number {
   return (hi + 0.05) / (lo + 0.05);
 }
 
-test("token pairs meet WCAG AA", () => {
-  const colors = createRequire(import.meta.url)(join(ROOT, "tailwind.config.js")).theme.extend.colors;
-  const pairs: [string, string, string][] = [
-    ["ink on paper", colors.ink.DEFAULT, colors.paper],
-    ["ink-2 on paper", colors.ink[2], colors.paper],
-    ["ink-2 on sheet", colors.ink[2], colors.sheet],
-    ["ink on have", colors.ink.DEFAULT, colors.have],
-    ["ink on close", colors.ink.DEFAULT, colors.close],
-    ["miss-text on sheet", colors.miss.text, colors.sheet],
-  ];
-  for (const [name, fg, bg] of pairs) {
-    assert.ok(contrast(fg, bg) >= 4.5, `${name}: ${contrast(fg, bg).toFixed(2)}:1`);
+test("token pairs meet WCAG AA in both themes", () => {
+  const palettes = createRequire(import.meta.url)(join(ROOT, "theme.palettes.js"));
+  for (const theme of ["light", "dark"]) {
+    const c = palettes[theme];
+    const pairs: [string, string, string][] = [
+      ["ink on paper", c.ink, c.paper],
+      ["ink-2 on paper", c.ink2, c.paper],
+      ["ink-2 on sheet", c.ink2, c.sheet],
+      ["ink on have", c.ink, c.have],
+      ["ink on close", c.ink, c.close],
+      ["miss-text on sheet", c.missText, c.sheet],
+      ["button text (paper) on ink", c.paper, c.ink],
+      ["button text (paper) on ink-2 hover", c.paper, c.ink2],
+    ];
+    for (const [name, fg, bg] of pairs) {
+      assert.ok(contrast(fg, bg) >= 4.5, `${theme}: ${name} is ${contrast(fg, bg).toFixed(2)}:1`);
+    }
   }
+});
+
+// Fixed white and black don't follow the theme; buttons use paper on ink instead.
+test("no fixed white or black that won't follow the theme", () => {
+  const found = sourceFiles(SRC).flatMap((file) =>
+    readFileSync(file, "utf8")
+      .split("\n")
+      .flatMap((line, i) => (/\b(text|bg)-(white|black)\b/.test(line) ? [`${file.slice(SRC.length + 1)}:${i + 1}`] : []))
+  );
+  assert.deepEqual(found, []);
 });
 
 // Safari before 16.4 (iOS 15) throws on regex lookbehind, which would take down any page that builds one.

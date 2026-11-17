@@ -1,4 +1,17 @@
 const defaultTheme = require("tailwindcss/defaultTheme");
+const plugin = require("tailwindcss/plugin");
+const palettes = require("./theme.palettes");
+
+// Palette key → CSS variable name. Colors are CSS variables so every token class follows the theme.
+const VARS = {
+  paper: "paper", sheet: "sheet", ink: "ink", ink2: "ink-2", rule: "rule", ruleSoft: "rule-soft",
+  have: "have", close: "close", miss: "miss", missText: "miss-text", missSoft: "miss-soft",
+};
+// "#F5F5F2" → "245 245 242", so opacity modifiers like bg-paper/95 still work.
+const channels = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(" ");
+const cssVars = (palette) =>
+  Object.fromEntries(Object.entries(VARS).map(([key, name]) => [`--${name}`, channels(palette[key])]));
+const color = (name) => `rgb(var(--${name}) / <alpha-value>)`;
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -7,15 +20,14 @@ module.exports = {
   ],
   theme: {
     extend: {
-      // Paper and ink. Green, yellow and red are only ever skill marks: have, close and missing.
       colors: {
-        paper: "#F5F5F2",
-        sheet: "#FFFFFF",
-        ink: { DEFAULT: "#1C1C1F", 2: "#45464D" },
-        rule: { DEFAULT: "#DCDBD5", soft: "#E6E5E0" },
-        have: "#C8EDB9",
-        close: "#FBE38A",
-        miss: { DEFAULT: "#C8412B", text: "#A8321F", soft: "#F6D3CB" },
+        paper: color("paper"),
+        sheet: color("sheet"),
+        ink: { DEFAULT: color("ink"), 2: color("ink-2") },
+        rule: { DEFAULT: color("rule"), soft: color("rule-soft") },
+        have: color("have"),
+        close: color("close"),
+        miss: { DEFAULT: color("miss"), text: color("miss-text"), soft: color("miss-soft") },
       },
       fontFamily: {
         sans: ["Public Sans", ...defaultTheme.fontFamily.sans],
@@ -23,5 +35,13 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    // public/index.html sets data-theme before first paint; useTheme changes it at runtime.
+    plugin(({ addBase }) =>
+      addBase({
+        ":root": { ...cssVars(palettes.light), colorScheme: "light" },
+        ':root[data-theme="dark"]': { ...cssVars(palettes.dark), colorScheme: "dark" },
+      })
+    ),
+  ],
 }

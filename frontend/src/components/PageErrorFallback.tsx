@@ -25,7 +25,7 @@ export default function PageErrorFallback() {
           </button>
           <button
             onClick={() => navigate("/")}
-            className="rounded-[3px] bg-ink px-6 py-2 text-sm font-semibold text-white hover:bg-black"
+            className="rounded-[3px] bg-ink px-6 py-2 text-sm font-semibold text-paper hover:bg-ink-2"
           >
             Go Home
           </button>

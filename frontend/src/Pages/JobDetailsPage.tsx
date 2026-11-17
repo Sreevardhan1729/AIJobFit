@@ -71,7 +71,7 @@ export default function JobDetailsPage() {
           href={job.job_url}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-[3px] bg-ink px-6 py-2.5 text-sm font-semibold text-white hover:bg-black"
+          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-[3px] bg-ink px-6 py-2.5 text-sm font-semibold text-paper hover:bg-ink-2"
         >
           Apply now <ExternalLink size={14} aria-hidden />
         </a>
