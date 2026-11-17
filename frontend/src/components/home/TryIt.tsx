@@ -1,10 +1,8 @@
 import React, { useState } from "react";
-import { FileText, Play, RotateCcw } from "lucide-react";
 import * as api from "../../api";
 import MatchReport from "../MatchReport";
 import ResumeDropZone from "../ResumeDropZone";
 import Button from "../ui/Button";
-import Card from "../ui/Card";
 import SectionHeading from "../ui/SectionHeading";
 import { FIELD, LABEL } from "../ui/fieldStyles";
 import { loadSampleResumeFile } from "../../data/loadSampleResume";
@@ -26,7 +24,8 @@ const RESULT_LABEL: Record<ResultKind, string> = {
   yours: "Your result",
 };
 
-const SEGMENT = "rounded-lg px-3 py-1.5 text-sm font-medium transition";
+const TAB = "border-b-2 pb-1 text-sm transition-colors";
+const TEXT_BUTTON = "text-sm font-medium text-ink underline decoration-rule underline-offset-4 hover:decoration-ink";
 
 export default function TryIt() {
   const [choice, setChoice] = useState<ResumeChoice>("sample");
@@ -34,6 +33,7 @@ export default function TryIt() {
   const [jobText, setJobText] = useState(SAMPLE_JOB_TEXT);
   const [showSample, setShowSample] = useState(false);
   const [result, setResult] = useState<MatchResult>(SNAPSHOT);
+  const [resultJobText, setResultJobText] = useState(SAMPLE_JOB_TEXT); // the text that produced `result`
   const [kind, setKind] = useState<ResultKind>("sample");
   const [runId, setRunId] = useState(0); // remounts the report so what-if marks reset per result
   const [status, setStatus] = useState<RunStatus>("idle");
@@ -58,6 +58,7 @@ export default function TryIt() {
       // Always anonymous: nothing run from the home page is saved to an account.
       const live = await api.getMatch(resume, jobText, undefined, { anonymous: true });
       setResult(live);
+      setResultJobText(jobText);
       setKind(isSampleRun ? "live" : "yours");
       setRunId((id) => id + 1);
       setStatus("idle");
@@ -71,6 +72,7 @@ export default function TryIt() {
     setOwnFile(null);
     setJobText(SAMPLE_JOB_TEXT);
     setResult(SNAPSHOT);
+    setResultJobText(SAMPLE_JOB_TEXT);
     setKind("sample");
     setRunId((id) => id + 1);
     setStatus("idle");
@@ -81,7 +83,7 @@ export default function TryIt() {
     status === "running"
       ? "The free server can take up to a minute to wake up."
       : status === "failed"
-        ? "The live server is waking up — try again in a moment."
+        ? "The live server is waking up. Try again in a moment."
         : "";
 
   return (
@@ -92,16 +94,16 @@ export default function TryIt() {
         subtitle="Edit the job, or switch to your own resume, then run it. Nothing here is saved."
       />
 
-      <div className="grid items-start gap-4 lg:grid-cols-2">
-        <Card>
-          <div className="mb-3 flex items-center justify-between gap-3">
+      <div className="grid border border-rule bg-sheet lg:grid-cols-2">
+        <div className="p-5 sm:p-6 lg:border-r lg:border-rule">
+          <div className="mb-4 flex items-baseline justify-between gap-3">
             <span className={`${LABEL} mb-0`}>Resume</span>
-            <div className="flex gap-1 rounded-xl bg-slate-950/70 p-1">
+            <div className="flex gap-5">
               <button
                 type="button"
                 aria-pressed={choice === "sample"}
                 onClick={() => setChoice("sample")}
-                className={`${SEGMENT} ${choice === "sample" ? "bg-slate-800 text-white" : "text-slate-400 hover:text-slate-200"}`}
+                className={`${TAB} ${choice === "sample" ? "border-ink font-semibold text-ink" : "border-transparent text-ink-2 hover:text-ink"}`}
               >
                 Sample resume
               </button>
@@ -109,7 +111,7 @@ export default function TryIt() {
                 type="button"
                 aria-pressed={choice === "own"}
                 onClick={() => setChoice("own")}
-                className={`${SEGMENT} ${choice === "own" ? "bg-slate-800 text-white" : "text-slate-400 hover:text-slate-200"}`}
+                className={`${TAB} ${choice === "own" ? "border-ink font-semibold text-ink" : "border-transparent text-ink-2 hover:text-ink"}`}
               >
                 Use my resume
               </button>
@@ -117,28 +119,23 @@ export default function TryIt() {
           </div>
 
           {choice === "sample" ? (
-            <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-4">
+            <div className="border border-rule-soft p-4">
               <div className="flex items-start justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <span className="rounded-xl bg-indigo-950 p-2 text-indigo-300">
-                    <FileText size={18} aria-hidden />
-                  </span>
-                  <div>
-                    <p className="font-semibold text-slate-100">Jane Doe — ML engineer</p>
-                    <p className="text-xs text-slate-400">Fictional sample resume</p>
-                  </div>
+                <div>
+                  <p className="font-semibold text-ink">Jane Doe, ML engineer</p>
+                  <p className="text-xs text-ink-2">Fictional sample resume</p>
                 </div>
                 <button
                   type="button"
                   aria-expanded={showSample}
                   onClick={() => setShowSample((open) => !open)}
-                  className="text-sm font-medium text-indigo-300 hover:text-indigo-200"
+                  className={TEXT_BUTTON}
                 >
                   {showSample ? "Hide" : "View"}
                 </button>
               </div>
               {showSample && (
-                <pre className="mt-4 max-h-64 overflow-auto whitespace-pre-wrap rounded-xl bg-slate-950/70 p-4 font-sans text-xs leading-relaxed text-slate-300">
+                <pre className="mt-4 max-h-64 overflow-auto whitespace-pre-wrap border-t border-rule-soft pt-4 font-sans text-xs leading-relaxed text-ink">
                   {SAMPLE_RESUME_TEXT}
                 </pre>
               )}
@@ -152,20 +149,15 @@ export default function TryIt() {
               hint="PDF only · used for this match, not saved"
             />
           )}
-        </Card>
+        </div>
 
-        <Card>
-          <div className="mb-3 flex items-center justify-between gap-3">
+        <div className="border-t border-rule p-5 sm:p-6 lg:border-t-0">
+          <div className="mb-3 flex items-baseline justify-between gap-3">
             <label htmlFor="try-job" className={`${LABEL} mb-0`}>
               Job description
             </label>
             {!(usingSampleInputs && kind === "sample") && (
-              <button
-                type="button"
-                onClick={reset}
-                className="inline-flex items-center gap-1 text-sm font-medium text-indigo-300 hover:text-indigo-200"
-              >
-                <RotateCcw size={14} aria-hidden />
+              <button type="button" onClick={reset} className={TEXT_BUTTON}>
                 Reset to sample
               </button>
             )}
@@ -178,27 +170,26 @@ export default function TryIt() {
             placeholder="Paste a job description here"
             className={`${FIELD} leading-relaxed`}
           />
-        </Card>
+        </div>
       </div>
 
       <div className="mt-6 flex flex-wrap items-center gap-3">
         <Button onClick={run} loading={status === "running"}>
-          {status !== "running" && <Play size={16} aria-hidden />}
           {status === "running" ? "Running…" : "Run match"}
         </Button>
         {error ? (
-          <span className="text-sm text-rose-300">{error}</span>
+          <span className="text-sm text-miss-text">{error}</span>
         ) : (
-          note && <span className="text-sm text-slate-400">{note}</span>
+          note && <span className="text-sm text-ink-2">{note}</span>
         )}
       </div>
 
-      <div className="mt-8">
-        <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">{RESULT_LABEL[kind]}</p>
-        <MatchReport key={runId} result={result} />
+      <div className="mt-10">
+        <p className="mb-3 text-sm font-semibold text-ink-2">{RESULT_LABEL[kind]}</p>
+        <MatchReport key={runId} result={result} jobText={resultJobText} />
       </div>
 
-      <div className="mt-6 flex flex-wrap items-center gap-3 text-sm text-slate-400">
+      <div className="mt-6 flex flex-wrap items-center gap-3 text-sm text-ink-2">
         Ready for real jobs?
         <Button to="/get_jobs" variant="secondary">
           Find jobs that fit your resume →

@@ -1,51 +1,35 @@
 import React from "react";
-import { BookOpen, Mail } from "lucide-react";
 import { GITHUB_URL } from "../Navbar";
 import { projectStats } from "../../data/projectStats";
-import { ReactComponent as GitHubIcon } from "../../svgs/github.svg";
-import { ReactComponent as LinkedinIcon } from "../../svgs/linkedin.svg";
-
-const ICON = "h-4 w-4 fill-current";
 
 const LINKS = [
-  { label: "Source on GitHub ↗", href: GITHUB_URL, icon: <GitHubIcon aria-hidden className={ICON} /> },
-  {
-    label: "API docs ↗",
-    href: "https://sreevardhan1729-aijobfit-backend.hf.space/docs",
-    icon: <BookOpen size={16} aria-hidden />,
-  },
-  {
-    label: "LinkedIn ↗",
-    href: "https://www.linkedin.com/in/sreevardhanreddy/",
-    icon: <LinkedinIcon aria-hidden className={ICON} />,
-  },
-  { label: "Email", href: "mailto:itssreevardhan@gmail.com", icon: <Mail size={16} aria-hidden /> },
+  { label: "Source on GitHub", href: GITHUB_URL },
+  { label: "API docs", href: "https://sreevardhan1729-aijobfit-backend.hf.space/docs" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/in/sreevardhanreddy/" },
+  { label: "Email", href: "mailto:itssreevardhan@gmail.com" },
 ];
 
+// A colophon: who made it, with what, and where to read more.
 export default function About() {
   return (
-    <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-      <div
-        id="about"
-        className="flex scroll-mt-24 flex-col gap-6 rounded-2xl border border-slate-800 bg-slate-900/80 p-6 lg:flex-row lg:items-center lg:justify-between"
-      >
+    <section className="mx-auto max-w-6xl px-4 pb-16 pt-4 sm:px-6">
+      <div id="about" className="grid scroll-mt-24 gap-6 border-t border-ink pt-6 lg:grid-cols-[1fr_auto] lg:items-baseline">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-300">About this project</p>
-          <p className="mt-2 text-lg font-semibold text-slate-100">Built by Sree Vardhan Reddy, software engineer in India</p>
-          <p className="mt-1 max-w-2xl text-sm leading-relaxed text-slate-400">
+          <h2 className="font-serif text-2xl font-medium text-ink">About this project</h2>
+          <p className="mt-2 text-ink">Built by Sree Vardhan Reddy, software engineer in India.</p>
+          <p className="mt-1 max-w-2xl text-sm leading-relaxed text-ink-2">
             React, TypeScript and Tailwind on Vercel · FastAPI, spaCy and MongoDB on Hugging Face ·{" "}
             {projectStats.backendTests} backend and {projectStats.frontendTests} frontend tests
           </p>
         </div>
-        <ul className="flex flex-wrap items-center gap-x-5 gap-y-3">
-          {LINKS.map(({ label, href, icon }) => (
+        <ul className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
+          {LINKS.map(({ label, href }) => (
             <li key={label}>
               <a
                 href={href}
-                className="inline-flex items-center gap-2 text-sm text-slate-300 hover:text-white"
+                className="text-ink underline decoration-rule underline-offset-4 hover:decoration-ink"
                 {...(href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
               >
-                {icon}
                 {label}
               </a>
             </li>

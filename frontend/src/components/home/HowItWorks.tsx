@@ -1,22 +1,17 @@
 import React, { useState } from "react";
-import { ArrowDown, ArrowRight, ChevronDown, FileText, Info } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import SectionHeading from "../ui/SectionHeading";
-import Chip from "../ui/Chip";
+import Mark from "../ui/Mark";
 import { projectStats } from "../../data/projectStats";
 
-const PIPELINE: { title: string; note: string; tone: "plain" | "step" | "result" }[] = [
-  { title: "Resume PDF", note: "+ job description", tone: "plain" },
-  { title: "Custom spaCy NER", note: `trained · skills F1 ${projectStats.skillsF1}`, tone: "step" },
-  { title: `${projectStats.skills}-skill dictionary`, note: "aliases · related skills", tone: "step" },
-  { title: "Weighted score", note: "required ×2 · partial credit", tone: "step" },
-  { title: "Explained result", note: "matched · partial · missing", tone: "result" },
+const PIPELINE = [
+  { title: "Read the PDF", note: "the resume's text, plus the job description" },
+  { title: "Tag skills with a custom spaCy model", note: `tok2vec + NER · skills F1 ${projectStats.skillsF1}` },
+  { title: `Catch misses with a ${projectStats.skills}-skill dictionary`, note: "aliases and related skills" },
+  { title: "Score and explain", note: "required skills count double, close ones earn half" },
 ];
 
-const NODE_STYLE = {
-  plain: "border-slate-700 bg-slate-900",
-  step: "border-indigo-500/60 bg-indigo-950/60",
-  result: "border-emerald-500/60 bg-emerald-950/60",
-};
+const TEXT_BUTTON = "text-sm font-medium text-ink underline decoration-rule underline-offset-4 hover:decoration-ink";
 
 // Stages 1, 2 and 4 show real output for the sample job (see scripts/build_sample.py);
 // the C# case in stage 3 is from the matching engine's tests.
@@ -35,19 +30,17 @@ const STEPS: { title: string; body: string; example: React.ReactNode }[] = [
     title: "Catch what the model misses",
     body: `A ${projectStats.skills}-skill dictionary is scanned too, longest match first. Ambiguous words like “Go” or “Swift” are never scanned.`,
     example: (
-      <span className="flex flex-wrap items-center gap-1.5">
-        <span className="mr-1 text-slate-400">Found in the job:</span>
-        <Chip tone="brand">MediaPipe</Chip>
-        <Chip tone="brand">Dlib</Chip>
-        <Chip tone="brand">Collaborative Filtering</Chip>
-      </span>
+      <>
+        <span className="text-ink-2">Found in the job:</span> <b className="font-semibold">MediaPipe</b>,{" "}
+        <b className="font-semibold">Dlib</b> and <b className="font-semibold">Collaborative Filtering</b>
+      </>
     ),
   },
   {
     title: "Normalize",
     body: "Aliases and spellings collapse to one canonical name, without merging look-alikes.",
     example: (
-      <ul className="space-y-1 font-mono text-xs">
+      <ul className="space-y-1">
         <li>ML / machine learning → Machine Learning</li>
         <li>sklearn → Scikit-learn</li>
         <li>C# stays C# (spaCy splits it into “C” + “#”)</li>
@@ -59,7 +52,11 @@ const STEPS: { title: string; body: string; example: React.ReactNode }[] = [
     body:
       "Required skills are worth 1 and preferred ½, detected from section headings and cues like “nice to have”. " +
       "Closely related skills earn half credit. The score is earned ÷ total, rounded the same on the server and in the browser.",
-    example: <Chip tone="partial">TensorFlow · via PyTorch</Chip>,
+    example: (
+      <>
+        <Mark kind="close">TensorFlow</Mark> <span className="text-ink-2">via PyTorch</span> earns half credit
+      </>
+    ),
   },
 ];
 
@@ -67,7 +64,7 @@ export default function HowItWorks() {
   const [showDetails, setShowDetails] = useState(false);
 
   return (
-    <section className="border-t border-slate-800/70 bg-slate-900/30">
+    <section className="border-t border-rule">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
         <SectionHeading
           id="how-it-works"
@@ -75,22 +72,12 @@ export default function HowItWorks() {
           subtitle={`A custom-trained spaCy model and a ${projectStats.skills}-skill dictionary pull the skills out of a resume and a job post, then score the fit and explain it, skill by skill.`}
         />
 
-        <ol className="flex flex-col items-stretch gap-2 md:flex-row md:items-center">
-          {PIPELINE.map((node, index) => (
-            <li key={node.title} className="flex flex-col items-center gap-2 md:flex-1 md:flex-row">
-              <div className={`w-full rounded-xl border px-4 py-3 text-center md:text-left ${NODE_STYLE[node.tone]}`}>
-                <p className="flex items-center justify-center gap-1.5 text-sm font-semibold text-slate-100 md:justify-start">
-                  {index === 0 && <FileText size={14} aria-hidden />}
-                  {node.title}
-                </p>
-                <p className="mt-0.5 text-xs text-slate-400">{node.note}</p>
-              </div>
-              {index < PIPELINE.length - 1 && (
-                <>
-                  <ArrowDown size={16} aria-hidden className="shrink-0 text-slate-600 md:hidden" />
-                  <ArrowRight size={16} aria-hidden className="hidden shrink-0 text-slate-600 md:block" />
-                </>
-              )}
+        <ol className="grid gap-x-8 gap-y-6 border-t border-ink pt-6 sm:grid-cols-2 lg:grid-cols-4">
+          {PIPELINE.map((step, index) => (
+            <li key={step.title}>
+              <p className="font-serif text-3xl font-medium leading-none text-ink">{index + 1}</p>
+              <p className="mt-3 font-semibold text-ink">{step.title}</p>
+              <p className="mt-1 text-sm text-ink-2">{step.note}</p>
             </li>
           ))}
         </ol>
@@ -100,7 +87,7 @@ export default function HowItWorks() {
           aria-expanded={showDetails}
           aria-controls="how-it-works-details"
           onClick={() => setShowDetails((open) => !open)}
-          className="mt-6 inline-flex items-center gap-1 text-sm font-medium text-indigo-300 hover:text-indigo-200"
+          className={`mt-8 inline-flex items-center gap-1 ${TEXT_BUTTON}`}
         >
           Technical details
           <ChevronDown size={14} aria-hidden className={`transition-transform ${showDetails ? "rotate-180" : ""}`} />
@@ -108,21 +95,18 @@ export default function HowItWorks() {
 
         {showDetails && (
           <div id="how-it-works-details" className="mt-6">
-            <ol className="grid gap-4 md:grid-cols-2">
+            <ol className="grid gap-x-10 gap-y-8 md:grid-cols-2">
               {STEPS.map((step, index) => (
-                <li key={step.title} className="rounded-2xl border border-slate-800 bg-slate-900/80 p-6">
-                  <p className="text-xs font-semibold text-indigo-300">Stage {index + 1}</p>
-                  <h3 className="mt-1 text-lg font-semibold text-slate-100">{step.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-slate-400">{step.body}</p>
-                  <div className="mt-4 rounded-xl border border-slate-800 bg-slate-950/60 p-4 text-sm text-slate-300">
-                    {step.example}
-                  </div>
+                <li key={step.title} className="border-t border-rule pt-5">
+                  <p className="text-sm text-ink-2">Stage {index + 1}</p>
+                  <h3 className="mt-1 font-serif text-xl font-medium text-ink">{step.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-ink-2">{step.body}</p>
+                  <div className="mt-4 border-l-2 border-rule pl-4 text-sm leading-relaxed text-ink">{step.example}</div>
                 </li>
               ))}
             </ol>
-            <p className="mt-4 flex items-start gap-3 text-sm text-slate-300">
-              <Info size={18} aria-hidden className="mt-0.5 shrink-0 text-indigo-300" />
-              The score is an estimate from skill overlap — not an employer's ATS score, and not hiring odds.
+            <p className="mt-8 border-l-2 border-ink pl-4 text-sm text-ink">
+              The score is an estimate from skill overlap, not an employer's ATS score, and not hiring odds.
               Experience is estimated from resume dates and never changes the score.
             </p>
           </div>

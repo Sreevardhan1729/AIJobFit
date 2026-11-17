@@ -1,5 +1,5 @@
 import React from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import TryIt from "./TryIt";
 import * as api from "../../api";
 import SAMPLE_MATCH from "../../data/sampleMatch.json";
@@ -116,4 +116,12 @@ test("failed live run keeps the previous result", async () => {
   expect(await screen.findByText(/waking up/)).toBeInTheDocument();
   expect(screen.getByText("Sample result")).toBeInTheDocument();
   expect(runButton()).toBeEnabled();
+});
+
+test("the report's job post is the text that produced the result, not the unsent edit", () => {
+  render(<TryIt />);
+  fireEvent.change(screen.getByRole("textbox"), { target: { value: "Python" } });
+  fireEvent.click(screen.getByRole("button", { name: "The job post, marked up" }));
+  const region = within(screen.getByRole("region", { name: "The job post, marked up" }));
+  expect(region.getByText(/We are seeking a skilled/)).toBeInTheDocument();
 });

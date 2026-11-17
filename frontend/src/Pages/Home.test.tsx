@@ -1,8 +1,9 @@
 import React from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import Home from "./Home";
 import { projectStats } from "../data/projectStats";
 import { GITHUB_URL } from "../components/Navbar";
+import SAMPLE_MATCH from "../data/sampleMatch.json";
 
 jest.mock(
   "react-router-dom",
@@ -44,7 +45,7 @@ test("the page has four sections and no second row of tool cards", () => {
 
 test("How it works shows the pipeline and keeps the stage details behind a toggle", () => {
   render(<Home />);
-  expect(screen.getByText(`${projectStats.skills}-skill dictionary`)).toBeInTheDocument();
+  expect(screen.getByText(`Catch misses with a ${projectStats.skills}-skill dictionary`)).toBeInTheDocument();
   expect(screen.queryByText(/Found in the job/)).not.toBeInTheDocument();
   fireEvent.click(screen.getByRole("button", { name: /Technical details/ }));
   expect(screen.getByText(/Found in the job/)).toBeInTheDocument();
@@ -62,4 +63,21 @@ test("About sums up the project in one block with true test counts", () => {
     "href",
     "https://sreevardhan1729-aijobfit-backend.hf.space/docs"
   );
+});
+
+test("the hero shows the sample job marked up with its score", () => {
+  render(<Home />);
+  const sheet = within(screen.getByRole("figure", { name: "Sample job, marked up" }));
+  expect(sheet.getByText(`${SAMPLE_MATCH.score}%`)).toBeInTheDocument();
+  expect(sheet.getByText(/Strong knowledge of/)).toBeInTheDocument();
+  expect(sheet.getByText("machine learning")).toHaveAttribute("data-mark", "have");
+  expect(sheet.getByText("MLOps")).toHaveAttribute("data-mark", "miss");
+  expect(sheet.getByText("TensorFlow")).toHaveAttribute("data-mark", "close");
+  ["on your resume", "close match", "missing"].forEach((text) => expect(sheet.getByText(text)).toBeInTheDocument());
+});
+
+test("no eyebrow labels above headings", () => {
+  render(<Home />);
+  expect(screen.queryByText("A FULL-STACK NLP PROJECT")).not.toBeInTheDocument();
+  expect(screen.queryByText("HOW IT WORKS")).not.toBeInTheDocument();
 });
