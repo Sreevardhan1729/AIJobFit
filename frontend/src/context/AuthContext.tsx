@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import type { User } from "../types";
 import * as api from "../api";
+import { readStorage, removeStorage, writeStorage } from "../lib/storage";
 
 interface AuthContextType {
   user: User | null;
@@ -16,7 +17,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem("token"));
+  const [token, setToken] = useState<string | null>(() => readStorage("token"));
   const [loading, setLoading] = useState(true);
 
   const fetchUser = useCallback(async () => {
@@ -28,7 +29,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const userData = await api.getMe();
       setUser(userData);
     } catch {
-      localStorage.removeItem("token");
+      removeStorage("token");
       setToken(null);
       setUser(null);
     } finally {
@@ -42,7 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, password: string) => {
     const response = await api.login(email, password);
-    localStorage.setItem("token", response.access_token);
+    writeStorage("token", response.access_token);
     setToken(response.access_token);
     const userData = await api.getMe();
     setUser(userData);
@@ -50,14 +51,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signup = async (email: string, password: string) => {
     const response = await api.signup(email, password);
-    localStorage.setItem("token", response.access_token);
+    writeStorage("token", response.access_token);
     setToken(response.access_token);
     const userData = await api.getMe();
     setUser(userData);
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
+    removeStorage("token");
     setToken(null);
     setUser(null);
   };

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { readStorage } from "./lib/storage";
 import type {
   AuthResponse,
   User,
@@ -18,7 +19,7 @@ const api = axios.create({ baseURL: API_URL });
 const publicApi = axios.create({ baseURL: API_URL, timeout: 90000 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
+  const token = readStorage("token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

@@ -3,6 +3,7 @@ import { useLocation, useParams, useNavigate } from "react-router-dom";
 import { ChevronDown, ExternalLink } from "lucide-react";
 import MatchReport from "../components/MatchReport";
 import { plainJobText } from "../lib/markup";
+import { readStorage, removeStorage } from "../lib/storage";
 import type { JobResult } from "../types";
 
 function formatDescription(raw = ""): string {
@@ -27,7 +28,7 @@ export default function JobDetailsPage() {
 
   const jobFromStorage = (() => {
     if (!id) return null;
-    const raw = localStorage.getItem(`handoff:${id}`);
+    const raw = readStorage(`handoff:${id}`);
     if (!raw) return null;
     try {
       const parsed = JSON.parse(raw);
@@ -41,7 +42,7 @@ export default function JobDetailsPage() {
   const [showDesc, setShowDesc] = useState(true);
 
   React.useEffect(() => {
-    if (id) localStorage.removeItem(`handoff:${id}`);
+    if (id) removeStorage(`handoff:${id}`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 

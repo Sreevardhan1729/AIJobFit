@@ -1,15 +1,7 @@
 import { useEffect, useState } from "react";
 import { resolveTheme, THEME_KEY } from "../lib/theme";
 import type { Theme } from "../lib/theme";
-
-// localStorage throws in some private modes; the theme then lasts until reload.
-function readStored(): string | null {
-  try {
-    return localStorage.getItem(THEME_KEY);
-  } catch {
-    return null;
-  }
-}
+import { readStorage, writeStorage } from "../lib/storage";
 
 const isChoice = (value: string | null) => value === "light" || value === "dark";
 
@@ -28,9 +20,9 @@ export function useTheme(): { theme: Theme; toggle: () => void } {
   const [theme, setTheme] = useState<Theme>(() => {
     const current = document.documentElement.dataset.theme;
     if (current === "light" || current === "dark") return current;
-    return resolveTheme(readStored(), Boolean(darkQuery()?.matches));
+    return resolveTheme(readStorage(THEME_KEY), Boolean(darkQuery()?.matches));
   });
-  const [chosen, setChosen] = useState(() => isChoice(readStored()));
+  const [chosen, setChosen] = useState(() => isChoice(readStorage(THEME_KEY)));
 
   useEffect(() => apply(theme), [theme]);
 
@@ -60,11 +52,7 @@ export function useTheme(): { theme: Theme; toggle: () => void } {
 
   const toggle = () => {
     const next: Theme = theme === "dark" ? "light" : "dark";
-    try {
-      localStorage.setItem(THEME_KEY, next);
-    } catch {
-      // Storage blocked: switch anyway.
-    }
+    writeStorage(THEME_KEY, next); // dropped when storage is blocked; the switch still happens
     setChosen(true);
     setTheme(next);
   };

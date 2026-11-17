@@ -2,6 +2,7 @@ import React from "react";
 import { ExternalLink } from "lucide-react";
 import type { JobResult } from "../types";
 import { matchLabel, skillPreview } from "../lib/match";
+import { writeStorage } from "../lib/storage";
 import Mark, { bandMark } from "./ui/Mark";
 import type { MarkKind } from "./ui/Mark";
 
@@ -25,7 +26,7 @@ function MarkedList({ label, names, kind }: { label: string; names: string[]; ki
 
 export default function JobCard({ job }: JobCardProps) {
   const handleDetails = () => {
-    localStorage.setItem(`handoff:${job.id}`, JSON.stringify(job));
+    writeStorage(`handoff:${job.id}`, JSON.stringify(job));
     window.open(`/get_jobs/${job.id}`, "_blank", "noopener,noreferrer");
   };
 
