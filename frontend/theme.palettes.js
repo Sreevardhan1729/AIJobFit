@@ -1,6 +1,6 @@
-// The two palettes of the paper-and-ink design, read by tailwind.config.js and the contrast test.
+// The two palettes of the paper-and-ink design, read by tailwind.config.js and the tests.
 // Green, yellow and red are only ever skill marks: have, close and missing.
-module.exports = {
+const palettes = {
   light: {
     paper: "#F5F5F2",
     sheet: "#FFFFFF",
@@ -31,3 +31,22 @@ module.exports = {
     scrim: "#000000",
   },
 };
+
+// Palette key → CSS variable name. Tailwind reads colors from these variables, so every token class follows
+// the theme; channels ("245 245 242") keep opacity modifiers like bg-paper/95 working.
+const VARS = {
+  paper: "paper", sheet: "sheet", ink: "ink", ink2: "ink-2", rule: "rule", ruleSoft: "rule-soft",
+  have: "have", close: "close", miss: "miss", missText: "miss-text", missSoft: "miss-soft", scrim: "scrim",
+};
+const channels = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(" ");
+const cssVars = (palette) =>
+  Object.fromEntries(Object.entries(VARS).map(([key, name]) => [`--${name}`, channels(palette[key])]));
+
+// Light on :root, dark under data-theme="dark", and light again on paper when printing.
+palettes.baseStyles = () => ({
+  ":root": { ...cssVars(palettes.light), colorScheme: "light" },
+  ':root[data-theme="dark"]': { ...cssVars(palettes.dark), colorScheme: "dark" },
+  "@media print": { ':root[data-theme="dark"]': { ...cssVars(palettes.light), colorScheme: "light" } },
+});
+
+module.exports = palettes;

@@ -11,6 +11,8 @@ function readStored(): string | null {
   }
 }
 
+const isChoice = (value: string | null) => value === "light" || value === "dark";
+
 const darkQuery = () =>
   typeof window.matchMedia === "function" ? window.matchMedia("(prefers-color-scheme: dark)") : null;
 
@@ -28,18 +30,33 @@ export function useTheme(): { theme: Theme; toggle: () => void } {
     if (current === "light" || current === "dark") return current;
     return resolveTheme(readStored(), Boolean(darkQuery()?.matches));
   });
-  const [chosen, setChosen] = useState(() => readStored() !== null);
+  const [chosen, setChosen] = useState(() => isChoice(readStored()));
 
   useEffect(() => apply(theme), [theme]);
 
   // With no stored choice, follow the device setting as it changes.
   useEffect(() => {
     const query = darkQuery();
-    if (chosen || !query?.addEventListener) return;
+    if (chosen || !query) return;
     const onChange = (e: { matches: boolean }) => setTheme(e.matches ? "dark" : "light");
-    query.addEventListener("change", onChange);
-    return () => query.removeEventListener("change", onChange);
+    if (query.addEventListener) {
+      query.addEventListener("change", onChange);
+      return () => query.removeEventListener("change", onChange);
+    }
+    query.addListener?.(onChange); // Safari 13 and older
+    return () => query.removeListener?.(onChange);
   }, [chosen]);
+
+  // A choice made in another tab applies here too.
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key !== THEME_KEY) return;
+      setChosen(isChoice(e.newValue));
+      setTheme(resolveTheme(e.newValue, Boolean(darkQuery()?.matches)));
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
 
   const toggle = () => {
     const next: Theme = theme === "dark" ? "light" : "dark";
