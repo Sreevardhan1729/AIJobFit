@@ -23,7 +23,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "test:logic": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test tests/match.test.ts tests/markup.test.ts tests/design.test.ts",
+    "test:logic": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test tests/match.test.ts tests/markup.test.ts tests/theme.test.ts tests/design.test.ts",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {

@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import AuthModal from "./AuthModal";
+import ThemeToggle from "./ThemeToggle";
 
 export const GITHUB_URL = "https://github.com/Sreevardhan1729/AIJobFit";
 
@@ -63,7 +64,7 @@ export default function Navbar() {
             AIJobFit
           </Link>
 
-          <div className="hidden items-center gap-6 md:flex">
+          <div className="hidden items-center gap-6 md:ml-auto md:flex">
             {TOOLS.map((tool) => (
               <Link
                 key={tool.to}
@@ -83,6 +84,9 @@ export default function Navbar() {
             </a>
             {authControl}
           </div>
+
+          {/* One toggle for every width, so its label can't fall out of step with a hidden twin. */}
+          <ThemeToggle className="ml-auto mr-1 md:ml-3 md:mr-0" />
 
           <button
             type="button"

@@ -4,7 +4,21 @@
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/logo192.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#F5F5F2" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#F5F5F2" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#151514" />
+    <script>
+      // Same rule as resolveTheme in src/lib/theme.ts, run before first paint so the page never flashes the
+      // wrong theme: a stored choice wins, otherwise the device setting.
+      (function () {
+        var stored = null;
+        try {
+          stored = localStorage.getItem("theme");
+        } catch (e) {}
+        var systemDark = !!window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+        var dark = stored === "dark" || (stored !== "light" && systemDark);
+        document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+      })();
+    </script>
     <meta
       name="description"
       content="AIJobFit matches a resume to a job description using a custom-trained spaCy model and a 309-skill dictionary, then explains the score skill by skill."
