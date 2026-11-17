@@ -26,7 +26,7 @@ export const job = {
 } as any;
 
 test("card shows band, score and skill preview", () => {
-  render(<JobCard job={job} index={0} />);
+  render(<JobCard job={job} />);
   expect(screen.getByText("Good match")).toBeInTheDocument();
   expect(screen.getByText("50%")).toBeInTheDocument();
   const matches = screen.getByText(/^Matches:/);
@@ -39,7 +39,7 @@ test("card shows band, score and skill preview", () => {
 });
 
 test("JobCard renders without match data", () => {
-  render(<JobCard job={{ ...job, match: undefined }} index={0} />);
+  render(<JobCard job={{ ...job, match: undefined }} />);
   expect(screen.getByText("ML Engineer")).toBeInTheDocument();
   expect(screen.queryByText(/^Matches:/)).not.toBeInTheDocument();
 });

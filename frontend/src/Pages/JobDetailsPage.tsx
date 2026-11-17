@@ -79,7 +79,8 @@ export default function JobDetailsPage() {
       </div>
 
       <div className="mt-8">
-        {job.match ? (
+        {/* A match with no score has no skills to mark, so it falls back to the plain description. */}
+        {job.match && job.match.score !== null ? (
           // The post appears once: marked up inside the report, open, so it follows the what-if marks.
           <MatchReport result={job.match} jobText={plainJobText(description)} jobTextOpen />
         ) : (

@@ -68,3 +68,10 @@ test("an empty description shows no job post section", () => {
   expect(screen.queryByRole("button", { name: "The job post, marked up" })).not.toBeInTheDocument();
   expect(screen.queryByRole("button", { name: "Job description" })).not.toBeInTheDocument();
 });
+
+test("a match without a score still shows the job description", () => {
+  mockState = { job: { ...mockJob, match: { ...match, score: null, skills: [] } } };
+  render(<JobDetailsPage />);
+  expect(screen.getByRole("button", { name: "Job description" })).toBeInTheDocument();
+  expect(screen.getByText("Build models.")).toBeInTheDocument();
+});

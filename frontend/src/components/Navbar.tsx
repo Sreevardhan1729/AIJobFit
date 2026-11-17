@@ -58,7 +58,7 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-rule bg-paper/95 backdrop-blur">
+      <header className="sticky top-0 z-50 border-b border-rule bg-paper">
         <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
           <Link to="/" onClick={closeMenu} className="font-serif text-xl font-semibold text-ink">
             AIJobFit
@@ -80,7 +80,7 @@ export default function Navbar() {
               How it works
             </a>
             <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className={LINK}>
-              GitHub
+              GitHub ↗
             </a>
             {authControl}
           </div>
@@ -118,7 +118,7 @@ export default function Navbar() {
                 How it works
               </a>
               <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className={MOBILE_LINK}>
-                GitHub
+                GitHub ↗
               </a>
               <div className="pt-3">{authControl}</div>
             </div>

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" fill="#F5F5F2"/>
+  <rect x="11" y="38" width="42" height="13" fill="#C8EDB9"/>
+  <text x="32" y="54" text-anchor="middle" font-family="Newsreader, Georgia, 'Times New Roman', serif" font-size="52" font-weight="600" fill="#1C1C1F">A</text>
+</svg>

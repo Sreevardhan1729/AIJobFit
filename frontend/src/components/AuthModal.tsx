@@ -106,7 +106,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               {mode === "signup" && (
                 <div>
                   <label className="mb-1 block text-sm font-semibold text-ink">
-                    Confirm Password
+                    Confirm password
                   </label>
                   <input
                     type="password"
@@ -126,7 +126,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 disabled={loading}
                 className="w-full rounded-[3px] bg-ink py-3 text-sm font-semibold text-paper hover:bg-ink-2 disabled:opacity-50"
               >
-                {loading ? "Please wait..." : mode === "login" ? "Log In" : "Sign Up"}
+                {loading ? "Please wait..." : mode === "login" ? "Log in" : "Sign up"}
               </button>
             </form>
 

@@ -55,7 +55,7 @@ export default function Login() {
             disabled={loading}
             className="w-full rounded-[3px] bg-ink py-3 text-sm font-semibold text-paper hover:bg-ink-2 disabled:opacity-50"
           >
-            {loading ? "Logging in..." : "Log In"}
+            {loading ? "Logging in..." : "Log in"}
           </button>
         </form>
         <p className="mt-4 text-center text-sm text-ink-2">

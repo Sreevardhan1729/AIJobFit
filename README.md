@@ -41,7 +41,7 @@ FastAPI (Hugging Face Space, Docker, Python 3.9)
 ```
 
 **Stack.**
-- **Frontend:** React 19, TypeScript, Tailwind CSS, Create React App, framer-motion.
+- **Frontend:** React 19, TypeScript, Tailwind CSS, Create React App.
 - **Backend:** FastAPI, spaCy 3.8, PyPDF2, Motor (MongoDB), JWT auth.
 - **Deploy:** Vercel (frontend) and Hugging Face Spaces (backend).
 

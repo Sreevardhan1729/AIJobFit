@@ -36,7 +36,7 @@ export default function Signup() {
   return (
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4">
       <div className="w-full max-w-md border border-rule bg-sheet p-8">
-        <h1 className="mb-6 font-serif text-3xl font-medium text-ink">Create account</h1>
+        <h1 className="mb-6 font-serif text-3xl font-medium text-ink">Create an account</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="mb-1 block text-sm font-semibold text-ink">Email</label>
@@ -59,7 +59,7 @@ export default function Signup() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-semibold text-ink">Confirm Password</label>
+            <label className="mb-1 block text-sm font-semibold text-ink">Confirm password</label>
             <input
               type="password"
               value={confirmPassword}
@@ -74,7 +74,7 @@ export default function Signup() {
             disabled={loading}
             className="w-full rounded-[3px] bg-ink py-3 text-sm font-semibold text-paper hover:bg-ink-2 disabled:opacity-50"
           >
-            {loading ? "Creating account..." : "Sign Up"}
+            {loading ? "Creating account..." : "Sign up"}
           </button>
         </form>
         <p className="mt-4 text-center text-sm text-ink-2">

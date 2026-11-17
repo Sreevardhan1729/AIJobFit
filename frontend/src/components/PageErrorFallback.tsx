@@ -21,13 +21,13 @@ export default function PageErrorFallback() {
             onClick={() => window.location.reload()}
             className="rounded-[3px] border border-ink px-6 py-2 text-sm font-medium text-ink hover:bg-paper"
           >
-            Reload Page
+            Reload page
           </button>
           <button
             onClick={() => navigate("/")}
             className="rounded-[3px] bg-ink px-6 py-2 text-sm font-semibold text-paper hover:bg-ink-2"
           >
-            Go Home
+            Go home
           </button>
         </div>
       </div>

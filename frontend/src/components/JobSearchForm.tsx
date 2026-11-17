@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Check, Search } from "lucide-react";
+import { Check } from "lucide-react";
 import { SITE_OPTIONS, CITY_OPTIONS_BY_COUNTRY, COUNTRIES, JOB_TYPES } from "../constants";
 import type { JobSearchInput } from "../hooks/useJobSearch";
 import { missingFields } from "../lib/match";
@@ -157,7 +157,6 @@ export default function JobSearchForm({ onSubmit, isLoading, error }: JobSearchF
 
       <div className="space-y-3 border-t border-rule pt-6">
         <Button type="submit" loading={isLoading} className="w-full py-3 text-base">
-          {!isLoading && <Search size={18} aria-hidden />}
           Find matching jobs
         </Button>
         <p className="text-center text-xs text-ink-2">Usually takes 20–60 seconds</p>

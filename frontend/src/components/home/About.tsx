@@ -3,9 +3,9 @@ import { GITHUB_URL } from "../Navbar";
 import { projectStats } from "../../data/projectStats";
 
 const LINKS = [
-  { label: "Source on GitHub", href: GITHUB_URL },
-  { label: "API docs", href: "https://sreevardhan1729-aijobfit-backend.hf.space/docs" },
-  { label: "LinkedIn", href: "https://www.linkedin.com/in/sreevardhanreddy/" },
+  { label: "Source on GitHub ↗", href: GITHUB_URL },
+  { label: "API docs ↗", href: "https://sreevardhan1729-aijobfit-backend.hf.space/docs" },
+  { label: "LinkedIn ↗", href: "https://www.linkedin.com/in/sreevardhanreddy/" },
   { label: "Email", href: "mailto:itssreevardhan@gmail.com" },
 ];
 
