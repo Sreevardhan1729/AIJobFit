@@ -65,3 +65,9 @@ test("token pairs meet WCAG AA", () => {
     assert.ok(contrast(fg, bg) >= 4.5, `${name}: ${contrast(fg, bg).toFixed(2)}:1`);
   }
 });
+
+// Safari before 16.4 (iOS 15) throws on regex lookbehind, which would take down any page that builds one.
+test("no regex lookbehind in app code", () => {
+  const found = sourceFiles(SRC).filter((file) => readFileSync(file, "utf8").includes("(?<"));
+  assert.deepEqual(found.map((file) => file.slice(SRC.length + 1)), []);
+});

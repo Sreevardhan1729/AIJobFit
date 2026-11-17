@@ -68,3 +68,12 @@ test("empty text", () => {
 test("plainJobText strips bold markers", () => {
   assert.equal(plainJobText("**About** the job"), "About the job");
 });
+
+test("ambiguous words are marked only as written and capitalised, never single letters", () => {
+  const go = s("Go", "missing", "Go");
+  const rest = s("REST API", "missing", "REST");
+  assert.deepEqual(marked("the rest of the team and go above and beyond on go-to-market", [go, rest]), []);
+  assert.deepEqual(marked("Build REST APIs in Go", [go, rest]), ["REST=REST API", "Go=Go"]);
+  assert.deepEqual(marked("You excel at SQL", [s("Microsoft Excel", "missing", "excel")]), []);
+  assert.deepEqual(marked("Series C funding, R&D and the C-suite", [s("C"), s("R")]), []);
+});

@@ -25,3 +25,8 @@ test("score bands map to marks", () => {
     "miss",
   ]);
 });
+
+test("close matches carry a cue besides colour, so they differ from have marks without hue", () => {
+  render(<Mark kind="close">TensorFlow</Mark>);
+  expect(screen.getByText("TensorFlow").className).toMatch(/decoration-dotted/);
+});

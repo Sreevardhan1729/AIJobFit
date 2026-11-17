@@ -4,5 +4,5 @@ export const projectStats = {
   skills: 309,
   skillsF1: 0.82,
   backendTests: 82,
-  frontendTests: 97,
+  frontendTests: 100,
 };
