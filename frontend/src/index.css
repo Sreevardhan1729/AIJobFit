@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    color-scheme: dark;
+    color-scheme: light;
   }
 
   html {
@@ -12,6 +12,6 @@
   }
 
   body {
-    @apply bg-slate-950 font-sans text-slate-300 antialiased;
+    @apply bg-paper font-sans text-ink antialiased;
   }
 }
