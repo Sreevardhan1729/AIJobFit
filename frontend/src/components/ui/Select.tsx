@@ -18,7 +18,7 @@ export default function Select({
         size={16}
         aria-hidden
         className={`pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 ${
-          props.disabled ? "text-slate-600" : "text-slate-400"
+          props.disabled ? "text-rule" : "text-ink-2"
         }`}
       />
     </div>

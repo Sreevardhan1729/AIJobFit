@@ -5,14 +5,14 @@ import Spinner from "./Spinner";
 type Variant = "primary" | "secondary" | "ghost";
 
 const BASE =
-  "inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors " +
-  "focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 " +
-  "focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-60";
+  "inline-flex items-center justify-center gap-2 rounded-[3px] px-4 py-2.5 text-sm font-semibold transition-colors " +
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink " +
+  "disabled:cursor-not-allowed disabled:opacity-60";
 
 const VARIANTS: Record<Variant, string> = {
-  primary: "bg-indigo-600 text-white shadow-lg shadow-indigo-500/20 hover:bg-indigo-700",
-  secondary: "border border-slate-700 bg-slate-900 text-slate-100 hover:border-slate-500 hover:bg-slate-800",
-  ghost: "text-indigo-300 hover:text-indigo-200",
+  primary: "bg-ink text-white hover:bg-black",
+  secondary: "border border-ink text-ink hover:bg-sheet",
+  ghost: "px-0 text-ink underline decoration-rule underline-offset-4 hover:decoration-ink",
 };
 
 type ButtonProps = {

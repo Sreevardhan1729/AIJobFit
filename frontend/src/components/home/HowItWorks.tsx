@@ -71,7 +71,6 @@ export default function HowItWorks() {
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
         <SectionHeading
           id="how-it-works"
-          eyebrow="How it works"
           title="Skills, not just keywords"
           subtitle={`A custom-trained spaCy model and a ${projectStats.skills}-skill dictionary pull the skills out of a resume and a job post, then score the fit and explain it, skill by skill.`}
         />

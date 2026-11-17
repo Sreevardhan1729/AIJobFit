@@ -88,7 +88,6 @@ export default function TryIt() {
     <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
       <SectionHeading
         id="try-it"
-        eyebrow="Try it"
         title="Try it on a sample resume"
         subtitle="Edit the job, or switch to your own resume, then run it. Nothing here is saved."
       />
