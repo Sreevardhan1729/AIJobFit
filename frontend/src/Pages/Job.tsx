@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import * as api from "../api";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
-import Chip from "../components/ui/Chip";
 import { FIELD, LABEL } from "../components/ui/fieldStyles";
 import { SAMPLE_JOB_TEXT } from "../data/sampleJob";
 
@@ -52,9 +51,8 @@ export default function Job() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
-      <p className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-300">Analyze</p>
-      <h1 className="mt-2 text-3xl font-bold text-slate-100">Analyze a job description</h1>
-      <p className="mt-2 max-w-2xl text-slate-400">
+      <h1 className="font-serif text-4xl font-medium text-ink">Analyze a job description</h1>
+      <p className="mt-3 max-w-2xl text-ink-2">
         Pull out the required and preferred skills, the experience asked for, and the other requirements.
       </p>
 
@@ -68,7 +66,7 @@ export default function Job() {
               <button
                 type="button"
                 onClick={() => setJobDescription(SAMPLE_JOB_TEXT)}
-                className="text-sm font-medium text-indigo-300 hover:text-indigo-200"
+                className="text-sm font-medium text-ink underline decoration-rule underline-offset-4 hover:decoration-ink"
               >
                 Use the sample job
               </button>
@@ -86,7 +84,7 @@ export default function Job() {
             <Button type="submit" loading={loading}>
               Analyze job
             </Button>
-            {error && <p className="text-sm text-rose-300">{error}</p>}
+            {error && <p className="text-sm text-miss-text">{error}</p>}
           </div>
         </form>
       </Card>
@@ -95,21 +93,26 @@ export default function Job() {
         <div className="mt-8 space-y-4">
           {groups.length === 0 ? (
             <Card>
-              <p className="text-sm text-slate-400">No skills or requirements found in this job description.</p>
+              <p className="text-sm text-ink-2">No skills or requirements found in this job description.</p>
             </Card>
           ) : (
             groups.map(([key, values]) => (
               <Card key={key}>
-                <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-400">
+                <h2 className="mb-3 font-serif text-xl font-medium text-ink">
                   {LABEL_NAMES[key] ?? key}
                 </h2>
-                <div className="flex flex-wrap gap-2">
+                <ul className="flex flex-wrap gap-2">
                   {values.map((value) => (
-                    <Chip key={value} tone={key === "Required Skills" ? "brand" : "neutral"}>
+                    <li
+                      key={value}
+                      className={`rounded-[3px] border px-2.5 py-1 text-sm text-ink ${
+                        key === "Required Skills" ? "border-ink font-medium" : "border-rule"
+                      }`}
+                    >
                       {value}
-                    </Chip>
+                    </li>
                   ))}
-                </div>
+                </ul>
               </Card>
             ))
           )}

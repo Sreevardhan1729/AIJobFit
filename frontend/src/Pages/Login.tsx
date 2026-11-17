@@ -26,41 +26,41 @@ export default function Login() {
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4">
-      <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-8 shadow-2xl shadow-black/40">
-        <h1 className="mb-6 text-2xl font-bold text-slate-100">Log In</h1>
+      <div className="w-full max-w-md border border-rule bg-sheet p-8">
+        <h1 className="mb-6 font-serif text-3xl font-medium text-ink">Log in</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-300">Email</label>
+            <label className="mb-1 block text-sm font-semibold text-ink">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full rounded-lg border border-slate-700 bg-slate-950 text-slate-100 placeholder:text-slate-500 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
+              className="w-full rounded-[3px] border border-rule bg-sheet p-3 text-sm text-ink placeholder:text-ink-2/80 focus:border-ink focus:outline-none focus:ring-1 focus:ring-ink"
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-300">Password</label>
+            <label className="mb-1 block text-sm font-semibold text-ink">Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full rounded-lg border border-slate-700 bg-slate-950 text-slate-100 placeholder:text-slate-500 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
+              className="w-full rounded-[3px] border border-rule bg-sheet p-3 text-sm text-ink placeholder:text-ink-2/80 focus:border-ink focus:outline-none focus:ring-1 focus:ring-ink"
             />
           </div>
-          {error && <p className="text-sm text-rose-300">{error}</p>}
+          {error && <p className="text-sm text-miss-text">{error}</p>}
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-indigo-600 py-3 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+            className="w-full rounded-[3px] bg-ink py-3 text-sm font-semibold text-white hover:bg-black disabled:opacity-50"
           >
             {loading ? "Logging in..." : "Log In"}
           </button>
         </form>
-        <p className="mt-4 text-center text-sm text-slate-400">
+        <p className="mt-4 text-center text-sm text-ink-2">
           Don't have an account?{" "}
-          <Link to="/signup" className="font-medium text-indigo-300 hover:underline">
+          <Link to="/signup" className="font-medium text-ink underline underline-offset-4">
             Sign up
           </Link>
         </p>

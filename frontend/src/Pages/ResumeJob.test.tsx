@@ -1,8 +1,9 @@
 import React from "react";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import ResumeJob from "./ResumeJob";
 import * as api from "../api";
 import { SAMPLE_JOB_TEXT } from "../data/sampleJob";
+import SAMPLE_MATCH from "../data/sampleMatch.json";
 
 jest.mock(
   "react-router-dom",
@@ -41,4 +42,18 @@ test("editing the job text after Try the sample still compares anonymously", asy
   expect(api.getMatch).toHaveBeenCalledWith(expect.any(File), "My own target job: Python, SQL", undefined, {
     anonymous: true,
   });
+});
+
+test("the report marks up the job post that was submitted, not later edits", async () => {
+  (api.getMatch as jest.Mock).mockReset();
+  (api.getMatch as jest.Mock).mockResolvedValue(SAMPLE_MATCH);
+  render(<ResumeJob />);
+  fireEvent.click(screen.getByRole("button", { name: "Try the sample" }));
+  await waitFor(() => expect(screen.getByRole("textbox")).toHaveValue(SAMPLE_JOB_TEXT));
+  fireEvent.click(screen.getByRole("button", { name: /Compare skills/ }));
+  const post = await screen.findByRole("button", { name: "The job post, marked up" });
+  fireEvent.change(screen.getByRole("textbox"), { target: { value: "Something else entirely" } });
+  fireEvent.click(post);
+  const region = within(screen.getByRole("region", { name: "The job post, marked up" }));
+  expect(region.getByText(/We are seeking a skilled/)).toBeInTheDocument();
 });

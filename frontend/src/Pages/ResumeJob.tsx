@@ -20,6 +20,7 @@ export default function ResumeJob() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<MatchResult | null>(null);
+  const [submittedJob, setSubmittedJob] = useState(""); // the text the shown result was computed from
 
   const trySample = async () => {
     setError("");
@@ -53,6 +54,7 @@ export default function ResumeJob() {
       const options = usingSample ? { anonymous: true } : undefined;
       const data = await api.getMatch(resumeFile, jobDescription, resumeId, options);
       setResult(data);
+      setSubmittedJob(jobDescription);
     } catch (err: any) {
       setError(err?.response?.data?.detail || "Error fetching comparison");
     } finally {
@@ -62,9 +64,8 @@ export default function ResumeJob() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
-      <p className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-300">Compare</p>
-      <h1 className="mt-2 text-3xl font-bold text-slate-100">Compare a resume with a job</h1>
-      <p className="mt-2 max-w-2xl text-slate-400">
+      <h1 className="font-serif text-4xl font-medium text-ink">Compare a resume with a job</h1>
+      <p className="mt-3 max-w-2xl text-ink-2">
         See which of the job's skills your resume already covers, which are close, and which are missing.
       </p>
 
@@ -76,7 +77,7 @@ export default function ResumeJob() {
               <button
                 type="button"
                 onClick={trySample}
-                className="text-sm font-medium text-indigo-300 hover:text-indigo-200"
+                className="text-sm font-medium text-ink underline decoration-rule underline-offset-4 hover:decoration-ink"
               >
                 Try the sample
               </button>
@@ -119,14 +120,14 @@ export default function ResumeJob() {
             <Button type="submit" loading={loading}>
               Compare skills
             </Button>
-            {error && <p className="text-sm text-rose-300">{error}</p>}
+            {error && <p className="text-sm text-miss-text">{error}</p>}
           </div>
         </form>
       </Card>
 
       {result && (
         <div className="mt-8">
-          <MatchReport result={result} />
+          <MatchReport result={result} jobText={submittedJob} />
         </div>
       )}
     </div>
