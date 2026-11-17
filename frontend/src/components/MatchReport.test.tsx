@@ -1,5 +1,5 @@
 import React from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import MatchReport from "./MatchReport";
 import type { Importance, MatchResult, SkillMatch, SkillStatus } from "../types";
 
@@ -98,7 +98,7 @@ test("matched skills are not toggleable", () => {
 test("long lists show 8 skills and a Show all button", () => {
   const many = Array.from({ length: 11 }, (_, i) => skill(`Skill ${i + 1}`, "missing"));
   render(<MatchReport result={{ ...result, score: 0, skills: many }} />);
-  expect(screen.getByText("+8 more")).toBeInTheDocument();
+  expect(screen.getByText("and 8 more")).toBeInTheDocument();
   open(/Missing skills/);
   expect(screen.getAllByRole("button", { name: /^Skill \d+$/ })).toHaveLength(8);
   open(/Show all 11/);
@@ -109,4 +109,38 @@ test("no job skills shows a message instead of a score", () => {
   render(<MatchReport result={{ ...result, score: null, skills: [] }} />);
   expect(screen.getByText("No skills found in this job description.")).toBeInTheDocument();
   expect(screen.queryByText(/%/)).not.toBeInTheDocument();
+});
+
+const expanders = () => screen.getAllByRole("button").filter((button) => button.hasAttribute("aria-expanded"));
+
+test("the marked-up job post is the first detail section and follows what-if marks", () => {
+  render(<MatchReport result={result} jobText="Python, Docker" />);
+  const post = screen.getByRole("button", { name: "The job post, marked up" });
+  expect(expanders().indexOf(post)).toBe(1); // right after "How this is scored"
+  expect(post).toHaveAttribute("aria-expanded", "false");
+  fireEvent.click(post);
+  const region = screen.getByRole("region", { name: "The job post, marked up" });
+  expect(within(region).getByText("Docker")).toHaveAttribute("data-mark", "miss");
+  expect(within(region).getByText("Python")).toHaveAttribute("data-mark", "have");
+  open(/Missing skills/);
+  fireEvent.click(screen.getByRole("button", { name: /Docker/ }));
+  expect(within(region).getByText("Docker")).toHaveAttribute("data-mark", "have");
+});
+
+test("jobTextOpen starts the job post open", () => {
+  render(<MatchReport result={result} jobText="Python, Docker" jobTextOpen />);
+  expect(screen.getByRole("button", { name: "The job post, marked up" })).toHaveAttribute("aria-expanded", "true");
+  expect(screen.getByRole("region", { name: "The job post, marked up" })).toBeInTheDocument();
+});
+
+test("no job text, no job post section", () => {
+  const { rerender } = render(<MatchReport result={result} />);
+  expect(screen.queryByRole("button", { name: "The job post, marked up" })).not.toBeInTheDocument();
+  rerender(<MatchReport result={result} jobText="   " />);
+  expect(screen.queryByRole("button", { name: "The job post, marked up" })).not.toBeInTheDocument();
+});
+
+test("the band reads as a mark", () => {
+  render(<MatchReport result={result} />);
+  expect(screen.getByText("Good match")).toHaveAttribute("data-mark", "have");
 });
