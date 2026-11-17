@@ -14,7 +14,7 @@ export default function SkillGapPanel({ jobs, selected, onSelect }: SkillGapPane
   if (gaps.length === 0) return null;
 
   return (
-    <div className="mx-auto mb-8 w-full max-w-3xl border border-rule bg-sheet p-6">
+    <div className="mx-auto mb-8 w-full max-w-4xl border border-rule bg-sheet p-6">
       <h2 className="mb-1 font-serif text-xl font-medium text-ink">Skills that would unlock the most of these jobs</h2>
       <p className="mb-4 text-sm text-ink-2">Click a skill to see only the jobs that ask for it.</p>
       <ul className="flex flex-wrap gap-2">

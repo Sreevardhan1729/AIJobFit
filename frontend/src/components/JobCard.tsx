@@ -38,7 +38,7 @@ export default function JobCard({ job }: JobCardProps) {
   const meta = [job.site, job.job_type, posted && `Posted ${posted}`].filter(Boolean).join(" · ");
 
   return (
-    <article className="w-full max-w-3xl border border-rule bg-sheet p-5 sm:p-6">
+    <article className="w-full max-w-4xl border border-rule bg-sheet p-5 sm:p-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0 space-y-1">
           <h2 className="line-clamp-2 font-serif text-xl font-medium leading-snug text-ink">{job.title}</h2>

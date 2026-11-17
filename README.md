@@ -9,7 +9,7 @@
 ## What it does
 
 - **Analyze a job description.** Required and preferred skills, the years of experience asked for, and education.
-- **Compare a resume with a job.** A weighted match score with matched, partial ("TensorFlow via PyTorch") and missing skills. You can mark skills you really have to see the score change. It also shows experience and education fit, and wording tips ("this job says *Scikit-Learn*; your resume says *sklearn*").
+- **Compare a resume with a job.** A weighted match score with matched, partial ("TensorFlow via PyTorch") and missing skills. You can mark skills you really have to see the score change. It also shows experience and education fit, and wording tips ("this job says *Scikit-Learn*; your resume says *sklearn*"). The job post itself is shown marked up: green for skills on your resume, yellow for close matches and a red wavy underline for missing ones.
 - **Search jobs.** Fresh LinkedIn and Indeed postings, ranked by fit, plus the skills that would unlock the most of them.
 - **Optional login** to save a resume for next time.
 

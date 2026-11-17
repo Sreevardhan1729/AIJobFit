@@ -12,7 +12,7 @@ export default function SearchProgress() {
   }, []);
 
   return (
-    <div className="mx-auto mt-6 flex max-w-3xl items-center gap-4 border border-rule bg-sheet p-5">
+    <div className="mx-auto mt-6 flex max-w-4xl items-center gap-4 border border-rule bg-sheet p-5">
       <Spinner className="h-6 w-6 text-ink" />
       <div className="flex-1">
         {/* Only the stage is announced; the per-second counter would be read out every second. */}
